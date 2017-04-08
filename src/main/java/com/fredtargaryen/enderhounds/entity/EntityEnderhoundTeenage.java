@@ -36,7 +36,7 @@ public class EntityEnderhoundTeenage extends EntityEnderhound
 
     public EntityEnderhoundTeenage(EntityEnderhoundPup pup)
     {
-        this(pup.worldObj);
+        this(pup.world);
         this.setHealth(this.getMaxHealth() * pup.getHealth() / pup.getMaxHealth());
     }
 

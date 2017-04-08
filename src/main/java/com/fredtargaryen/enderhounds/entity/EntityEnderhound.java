@@ -171,7 +171,7 @@ public abstract class EntityEnderhound extends EntityMob implements Comparable<E
     protected void getNearbyHounds()
     {
         this.nearbyHounds.clear();
-        for(Object o : this.worldObj.getEntitiesWithinAABB(EntityEnderhound.class,
+        for(Object o : this.world.getEntitiesWithinAABB(EntityEnderhound.class,
                 new AxisAlignedBB(this.posX - 0.5, this.posY - 0.5, this.posZ - 0.5,
                         this.posX + 0.5, this.posY + 0.5, this.posZ + 0.5)
                         .expand(DataReference.HERDRANGEXZ, DataReference.HERDRANGEY, DataReference.HERDRANGEXZ)))
@@ -273,11 +273,11 @@ public abstract class EntityEnderhound extends EntityMob implements Comparable<E
     @Override
     public void onLivingUpdate()
     {
-        if (this.worldObj.isRemote)
+        if (this.world.isRemote)
         {
             for (int i = 0; i < 2; ++i)
             {
-                this.worldObj.spawnParticle(EnumParticleTypes.PORTAL, this.posX + (this.rand.nextDouble() - 0.5D) * (double)this.width, this.posY + this.rand.nextDouble() * (double)this.height - 0.25D, this.posZ + (this.rand.nextDouble() - 0.5D) * (double)this.width, (this.rand.nextDouble() - 0.5D) * 2.0D, -this.rand.nextDouble(), (this.rand.nextDouble() - 0.5D) * 2.0D, new int[0]);
+                this.world.spawnParticle(EnumParticleTypes.PORTAL, this.posX + (this.rand.nextDouble() - 0.5D) * (double)this.width, this.posY + this.rand.nextDouble() * (double)this.height - 0.25D, this.posZ + (this.rand.nextDouble() - 0.5D) * (double)this.width, (this.rand.nextDouble() - 0.5D) * 2.0D, -this.rand.nextDouble(), (this.rand.nextDouble() - 0.5D) * 2.0D, new int[0]);
             }
         }
 
@@ -290,7 +290,7 @@ public abstract class EntityEnderhound extends EntityMob implements Comparable<E
     {
         if (this.isWet())
         {
-            this.attackEntityFrom(DamageSource.drown, 1.0F);
+            this.attackEntityFrom(DamageSource.DROWN, 1.0F);
         }
         super.updateAITasks();
     }
@@ -299,11 +299,11 @@ public abstract class EntityEnderhound extends EntityMob implements Comparable<E
      * Applies the given player interaction to this Entity.
      */
     @Override
-    public EnumActionResult applyPlayerInteraction(EntityPlayer player, Vec3d vec, @Nullable ItemStack stack, EnumHand hand)
+    public EnumActionResult applyPlayerInteraction(EntityPlayer player, Vec3d vec, EnumHand stack)
     {
         this.setAttackTarget(this.getAttackTarget() == null ? player : null);
 
-        return super.applyPlayerInteraction(player, vec, stack, hand);
+        return super.applyPlayerInteraction(player, vec, stack);
     }
 
     @Override

@@ -11,14 +11,16 @@
  * Aggressive:
  * -At >20% health, will take 3 hits before tp'ing
  * -Stares and shakes very briefly before attacking
+ * -Gives in at <5% health
  * Cunning:
  * -On hit, teleports behind target
  * -Stares and shakes a random amount of time before
  * attacking
- * -Occasionally pretends to give in at <60% health
+ * -Occasionally pretends to give in at <50% health
  * Weak:
  * -Teleports far away on hit
  * -Stares for a long time before attacking
+ * -Gives in at <50% health
  */
 package com.fredtargaryen.enderhounds;
 
@@ -26,6 +28,7 @@ import com.fredtargaryen.enderhounds.entity.*;
 import com.fredtargaryen.enderhounds.proxy.CommonProxy;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EnumCreatureType;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -63,13 +66,14 @@ public class EnderhoundsBase
 
         //Register Entities with EntityRegistry
         //Last three params are for tracking: trackingRange, updateFrequency and sendsVelocityUpdates
-        EntityRegistry.registerModEntity(EntityEnderhoundPup.class, "enderhound0", 0, instance, 64, 10, true);
-        EntityRegistry.registerModEntity(EntityEnderhoundTeenage.class, "enderhound1", 1, instance, 64, 10, true);
-        EntityRegistry.registerModEntity(EntityEnderhoundMature.class, "enderhound2", 2, instance, 64, 10, true);
-        EntityRegistry.registerModEntity(EntityEnderhoundElderly.class, "enderhound3", 3, instance, 64, 10, true);
+        ResourceLocation pupRL = new ResourceLocation(DataReference.MODID+":pup");
+        EntityRegistry.registerModEntity(pupRL, EntityEnderhoundPup.class, "enderhound0", 0, instance, 64, 10, true);
+        EntityRegistry.registerModEntity(new ResourceLocation(DataReference.MODID+":teenage"), EntityEnderhoundTeenage.class, "enderhound1", 1, instance, 64, 10, true);
+        EntityRegistry.registerModEntity(new ResourceLocation(DataReference.MODID+":mature"), EntityEnderhoundMature.class, "enderhound2", 2, instance, 64, 10, true);
+        EntityRegistry.registerModEntity(new ResourceLocation(DataReference.MODID+":elderly"), EntityEnderhoundElderly.class, "enderhound3", 3, instance, 64, 10, true);
 
         //Change egg colour one day
-        EntityRegistry.registerEgg(EntityEnderhoundPup.class, 0, 1447446);
+        EntityRegistry.registerEgg(pupRL, 0, 1447446);
 
         //Add spawns
         EntityRegistry.addSpawn(EntityEnderhoundPup.class, 100, 1, 1, EnumCreatureType.MONSTER);

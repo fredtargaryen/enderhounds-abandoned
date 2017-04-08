@@ -33,7 +33,7 @@ public class EntityEnderhoundElderly extends EntityEnderhound
 
     public EntityEnderhoundElderly(EntityEnderhoundMature adult)
     {
-        this(adult.worldObj);
+        this(adult.world);
         this.power = adult.power;
         this.personality = adult.personality;
         if(this.personality == Personality.AGGRESSIVE)

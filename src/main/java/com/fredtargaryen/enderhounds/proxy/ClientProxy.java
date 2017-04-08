@@ -1,6 +1,7 @@
 package com.fredtargaryen.enderhounds.proxy;
 
 import com.fredtargaryen.enderhounds.client.renderer.entity.RenderEnderhound;
+import com.fredtargaryen.enderhounds.client.renderer.entity.RenderPupFactory;
 import com.fredtargaryen.enderhounds.entity.EntityEnderhound;
 import com.fredtargaryen.enderhounds.entity.EntityEnderhoundPup;
 import net.minecraft.client.Minecraft;
@@ -11,7 +12,7 @@ public class ClientProxy extends CommonProxy
 {
     public void registerRenderers()
     {
-        RenderingRegistry.registerEntityRenderingHandler(EntityEnderhoundPup.class, new RenderEnderhound(Minecraft.getMinecraft().getRenderManager(), EntityEnderhound.GrowthStage.PUP, 0.5F));
+        RenderingRegistry.registerEntityRenderingHandler(EntityEnderhoundPup.class, new RenderPupFactory());
     }
 
     public void registerModels()

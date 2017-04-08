@@ -36,7 +36,7 @@ public class EntityEnderhoundMature extends EntityEnderhound
 
     public EntityEnderhoundMature(EntityEnderhoundTeenage teen)
     {
-        this(teen.worldObj);
+        this(teen.world);
         this.personality = teen.personality;
         this.power = teen.power;
         this.setHealth(this.getMaxHealth() * teen.getHealth() / teen.getMaxHealth());
