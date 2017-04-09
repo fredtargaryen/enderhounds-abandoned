@@ -1,8 +1,6 @@
 package com.fredtargaryen.enderhounds.proxy;
 
-import com.fredtargaryen.enderhounds.client.renderer.entity.RenderEnderhound;
 import com.fredtargaryen.enderhounds.client.renderer.entity.RenderPupFactory;
-import com.fredtargaryen.enderhounds.entity.EntityEnderhound;
 import com.fredtargaryen.enderhounds.entity.EntityEnderhoundPup;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemModelMesher;

@@ -1,6 +1,15 @@
 /**
  * TODO
  * Angry ear rotation
+ * They walk too fast
+ * Make ears slightly thiccer to avoid "see-through" problem (may not work)
+ * AI (see EntityEnderhound constructor)
+ * Fix hitboxes
+ * Fix eye heights (see GrowthStage)
+ * Pelt
+ * Armour
+ * Humans and Endermen as leaders
+ * Banner
  *
  * Other notes:
  * Pup - drop 0-1 pelt
@@ -11,7 +20,6 @@
  * Aggressive:
  * -At >20% health, will take 3 hits before tp'ing
  * -Stares and shakes very briefly before attacking
- * -Gives in at <5% health
  * Cunning:
  * -On hit, teleports behind target
  * -Stares and shakes a random amount of time before
@@ -20,7 +28,6 @@
  * Weak:
  * -Teleports far away on hit
  * -Stares for a long time before attacking
- * -Gives in at <50% health
  */
 package com.fredtargaryen.enderhounds;
 
@@ -81,13 +88,13 @@ public class EnderhoundsBase
         //EntityRegistry.addSpawn(EntityEnderhoundTeenage.class, 3, 1, 3, EnumCreatureType.MONSTER);
         //EntityRegistry.addSpawn(EntityEnderhoundMature.class, 2, 1, 3, EnumCreatureType.MONSTER);
         //EntityRegistry.addSpawn(EntityEnderhoundElderly.class, 1, 1, 3, EnumCreatureType.MONSTER);
+
+        proxy.registerRenderers();
     }
 
     @Mod.EventHandler
     public void load(FMLInitializationEvent event)
     {
-        //Proxy registering
-        proxy.registerRenderers();
         proxy.registerModels();
     }
 

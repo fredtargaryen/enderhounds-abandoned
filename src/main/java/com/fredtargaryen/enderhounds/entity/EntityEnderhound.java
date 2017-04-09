@@ -299,11 +299,11 @@ public abstract class EntityEnderhound extends EntityMob implements Comparable<E
      * Applies the given player interaction to this Entity.
      */
     @Override
-    public EnumActionResult applyPlayerInteraction(EntityPlayer player, Vec3d vec, EnumHand stack)
+    public boolean processInteract(EntityPlayer player, EnumHand hand)
     {
         this.setAttackTarget(this.getAttackTarget() == null ? player : null);
 
-        return super.applyPlayerInteraction(player, vec, stack);
+        return super.processInteract(player, hand);
     }
 
     @Override

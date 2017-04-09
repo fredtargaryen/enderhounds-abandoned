@@ -14,19 +14,21 @@ import net.minecraft.util.ResourceLocation;
 
 import java.util.Random;
 
-public class RenderEnderhound extends RenderLiving
+public class RenderEnderhound extends RenderLiving<EntityEnderhound>
 {
     private ResourceLocation[] textures = {new ResourceLocation(DataReference.MODID,"textures/models/pup.png")};
                                             //new ResourceLocation(DataReference.MODID+":textures/entity/teenage.png"),
-                                            //new ResourceLocation(DataReference.MODID+":textures/entity/elderly.png"),
-                                            //new ResourceLocation(DataReference.MODID+":textures/entity/mature.png")};
-    private static ModelBase[] models = {new ModelEnderhoundPup()};//, new ModelEnderhoundTeenage(), new ModelEnderhoundElderly(), new ModelEnderhoundMature()};
+                                            //new ResourceLocation(DataReference.MODID+":textures/entity/mature.png")},
+                                            //new ResourceLocation(DataReference.MODID+":textures/entity/elderly.png")};
+
+    private static ModelBase[] models = {new ModelEnderhoundPup()};//, new ModelEnderhoundTeenage(), new ModelEnderhoundMature(), new ModelEnderhoundElderly()};
     private Random rnd = new Random();
 
     public RenderEnderhound(RenderManager p_i46153_1_, EntityEnderhound.GrowthStage stage, float p_i46153_3)
     {
-        super(p_i46153_1_, models[stage.getStrengthLevel()], p_i46153_3);
+        super(p_i46153_1_, models[stage.ordinal()], p_i46153_3);
     }
+
     /**
      * Actually renders the *Enderhound*
      */
@@ -44,33 +46,8 @@ public class RenderEnderhound extends RenderLiving
     /**
      * Returns the location of an entity's texture. Doesn't seem to be called unless you call Render.bindEntityTexture.
      */
-    protected ResourceLocation getEntityTexture(Entity entity)
+    protected ResourceLocation getEntityTexture(EntityEnderhound hound)
     {
-        EntityEnderhound hound = (EntityEnderhound)entity;
-        return textures[hound.stage.getStrengthLevel()];
-    }
-
-    /**
-     * Casts EntityLiving -> EntityEnderhound
-     */
-    public void doRender(EntityLiving entity, double x, double y, double z, float p_76986_8_, float partialTicks)
-    {
-        this.doRender((EntityEnderhound)entity, x, y, z, p_76986_8_, partialTicks);
-    }
-
-    /**
-     * Casts EntityLivingBase -> EntityEnderhound
-     */
-    public void doRender(EntityLivingBase entity, double x, double y, double z, float p_76986_8_, float partialTicks)
-    {
-        this.doRender((EntityEnderman)entity, x, y, z, p_76986_8_, partialTicks);
-    }
-
-    /**
-     * Casts Entity -> EntityEnderhound
-     */
-    public void doRender(Entity entity, double x, double y, double z, float p_76986_8_, float partialTicks)
-    {
-        this.doRender((EntityEnderhound)entity, x, y, z, p_76986_8_, partialTicks);
+        return textures[hound.stage.ordinal()];
     }
 }
