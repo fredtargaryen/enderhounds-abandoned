@@ -7,7 +7,6 @@ import net.minecraft.entity.Entity;
 
 public class ModelEnderhoundPup extends ModelBase
 {
-    //fields
     ModelRenderer Body1;
     ModelRenderer Head;
     ModelRenderer Body2;
@@ -29,7 +28,7 @@ public class ModelEnderhoundPup extends ModelBase
     {
         textureWidth = 64;
         textureHeight = 32;
-
+    
         Body1 = new ModelRenderer(this, 0, 0);
         Body1.addBox(-3F, -3F, -2F, 6, 6, 4);
         Body1.setRotationPoint(0F, 11.7F, -4F);
@@ -43,7 +42,7 @@ public class ModelEnderhoundPup extends ModelBase
         Head.mirror = true;
         setRotation(Head, 0F, 0F, 0F);
         Body2 = new ModelRenderer(this, 20, 0);
-        Body2.addBox(-3F, -3F, -2F, 6, 6, 4);
+        Body2.addBox(-3F, -6F, -2F, 6, 6, 4);
         Body2.setRotationPoint(0F, 11.7F, 0F);
         Body2.setTextureSize(64, 32);
         Body2.mirror = true;
@@ -54,40 +53,38 @@ public class ModelEnderhoundPup extends ModelBase
         Body3.setTextureSize(64, 32);
         Body3.mirror = true;
         setRotation(Body3, 0F, 0F, 0F);
-        Ear_L = new ModelRenderer(this, 60, 0);
-        Ear_L.addBox(0F, -6F, -2F, 0, 6, 2);
+        Ear_L = new ModelRenderer(this, 58, 10);
+        Ear_L.addBox(-1F, -5F, -2F, 1, 6, 2);
         Ear_L.setRotationPoint(2.5F, 5.7F, -5F);
         Ear_L.setTextureSize(64, 32);
         Ear_L.mirror = true;
-        setRotation(Ear_L, 0F, 0.1745329F, 0F);
+        setRotation(Ear_L, 0F, 0.2617994F, 0F);
         Leg_L_F = new ModelRenderer(this, 56, 19);
-        Leg_L_F.mirror = true;
         Leg_L_F.addBox(-1F, 0F, -1F, 2, 10, 2);
-        Leg_L_F.setRotationPoint(1.9F, 14.0F, -4.9F);
+        Leg_L_F.setRotationPoint(1.9F, 14F, -4.9F);
         Leg_L_F.setTextureSize(64, 32);
         Leg_L_F.mirror = true;
-        setRotation(Leg_L_F, 0.0F, 0F, 0F);
+        setRotation(Leg_L_F, 0F, 0F, 0F);
         Leg_L_F.mirror = false;
         Leg_R_F = new ModelRenderer(this, 56, 19);
         Leg_R_F.addBox(-1F, 0F, -1F, 2, 10, 2);
-        Leg_R_F.setRotationPoint(-1.9F, 14.0F, -4.9F);
+        Leg_R_F.setRotationPoint(-1.9F, 14F, -4.9F);
         Leg_R_F.setTextureSize(64, 32);
         Leg_R_F.mirror = true;
-        setRotation(Leg_R_F, 0.0F, 0F, 0F);
+        setRotation(Leg_R_F, 0F, 0F, 0F);
         Leg_L_B = new ModelRenderer(this, 56, 19);
-        Leg_L_B.mirror = true;
         Leg_L_B.addBox(-1F, 0F, -1F, 2, 10, 2);
         Leg_L_B.setRotationPoint(1.9F, 14F, 4.9F);
         Leg_L_B.setTextureSize(64, 32);
         Leg_L_B.mirror = true;
-        setRotation(Leg_L_B, 0.0F, 0F, 0F);
+        setRotation(Leg_L_B, 0F, 0F, 0F);
         Leg_L_B.mirror = false;
         Leg_R_B = new ModelRenderer(this, 56, 19);
         Leg_R_B.addBox(-1F, 0F, -1F, 2, 10, 2);
         Leg_R_B.setRotationPoint(-1.9F, 14F, 4.9F);
         Leg_R_B.setTextureSize(64, 32);
         Leg_R_B.mirror = true;
-        setRotation(Leg_R_B, 0.0F, 0F, 0F);
+        setRotation(Leg_R_B, 0F, 0F, 0F);
         Tail = new ModelRenderer(this, 45, 20);
         Tail.addBox(-1F, -1F, -1F, 2, 10, 2);
         Tail.setRotationPoint(0F, 10.2F, 5F);
@@ -100,13 +97,12 @@ public class ModelEnderhoundPup extends ModelBase
         Snout.setTextureSize(64, 32);
         Snout.mirror = true;
         setRotation(Snout, 0F, 0F, 0F);
-        Ear_R = new ModelRenderer(this, 60, 0);
-        Ear_R.mirror = true;
-        Ear_R.addBox(0F, -6F, -2F, 0, 6, 2);
+        Ear_R = new ModelRenderer(this, 58, 10);
+        Ear_R.addBox(0F, -5F, -2F, 1, 6, 2);
         Ear_R.setRotationPoint(-2.5F, 5.7F, -5F);
         Ear_R.setTextureSize(64, 32);
         Ear_R.mirror = true;
-        setRotation(Ear_R, 0F, -0.1745329F, 0F);
+        setRotation(Ear_R, 0F, -0.2617994F, 0F);
         Ear_R.mirror = false;
         Tooth_T = new ModelRenderer(this, 62, 31);
         Tooth_T.addBox(-0.5F, 0F, 0F, 1, 1, 0);
@@ -134,9 +130,6 @@ public class ModelEnderhoundPup extends ModelBase
         setRotation(Jaw_Membrane, 0F, 0F, 0F);
     }
 
-    /**
-     * Changes points and angles based on entity state, before telling each body part to render.
-     */
     public void render(Entity entity, float time, float walkSpeed, float whatever, float f3, float f4, float f5)
     {
         super.render(entity, time, walkSpeed, whatever, f3, f4, f5);
@@ -145,9 +138,9 @@ public class ModelEnderhoundPup extends ModelBase
         if(pup.getAttackTarget() == null)
         {
             Body2.setRotationPoint(0F, 11.7F, 0F);
-            setRotation(Ear_L, 0F, 0.1745329F, 0F);
+            setRotation(Ear_L, 0F, 0.26179939F, 0F);
             setRotation(Tail, 0.7853982F, 0F, 0F);
-            setRotation(Ear_R, 0F, -0.1745329F, 0F);
+            setRotation(Ear_R, 0F, -0.26179939F, 0F);
             Tooth_T.setRotationPoint(0F, 8.7F, -12F);
             Tooth_B.setRotationPoint(0F, 9.7F, -12F);
             Jaw.setRotationPoint(0F, 9.2F, -9F);
@@ -158,8 +151,9 @@ public class ModelEnderhoundPup extends ModelBase
             //Arch the back, like a cat
             Body2.setRotationPoint(0F, 8.7F, 0F);
             //Fold back ears
-            setRotation(Ear_L, 0.7853982F, 1.5707963F, 0.0F);
-            setRotation(Ear_R, 0.7853982F, -1.5707963F, 0.0F);
+            //When X = PI / 4, they cross over behind and above head
+            setRotation(Ear_L, 0F, 1.5707963F, -1.17809725F);
+            setRotation(Ear_R, 0F, -1.5707963F, 1.17809725F);
             //Straighten tail
             setRotation(Tail, 1.5707963F, 0F, 0F);
             //Show teeth
@@ -170,7 +164,7 @@ public class ModelEnderhoundPup extends ModelBase
             Jaw_Membrane.setRotationPoint(0F, 10.7F, -9F);
         }
         Body1.render(f5);
-        Head.render(f5);
+        Head.render(((EntityEnderhoundPup) entity).getLeader() == null ? f5 : f5 / 2);
         Body2.render(f5);
         Body3.render(f5);
         Ear_L.render(f5);
@@ -186,7 +180,7 @@ public class ModelEnderhoundPup extends ModelBase
         Jaw.render(f5);
         Jaw_Membrane.render(f5);
     }
-
+  
     private void setRotation(ModelRenderer model, float x, float y, float z)
     {
         model.rotateAngleX = x;

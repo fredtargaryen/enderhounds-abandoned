@@ -23,7 +23,10 @@ public class EntityEnderhoundPup extends EntityEnderhound
 
     protected void grow()
     {
-        new EntityEnderhoundTeenage(this);
+        EntityEnderhoundTeenage eet = new EntityEnderhoundTeenage(this);
+        eet.setLocationAndAngles(this.posX, this.posY, this.posZ, this.rotationYaw, this.rotationPitch);
+        eet.refreshLeader();
+        this.world.spawnEntity(eet);
         super.grow();
     }
 }

@@ -1,5 +1,7 @@
 package com.fredtargaryen.enderhounds;
 
+import net.minecraft.util.ResourceLocation;
+
 /**
  * When updating, change version number in here, mcmod.info and build.gradle.
  */
@@ -14,4 +16,6 @@ public class DataReference
 
     public static final double HERDRANGEXZ = 30;
     public static final double HERDRANGEY = 30;
+
+    public static final ResourceLocation LEAD_CAP_LOCATION = new ResourceLocation(DataReference.MODID, "ILeadPackCapability");
 }

@@ -1,6 +1,8 @@
 package com.fredtargaryen.enderhounds.entity;
 
 import com.fredtargaryen.enderhounds.DataReference;
+import com.fredtargaryen.enderhounds.entity.ai.EntityAIPackLogic;
+import com.fredtargaryen.enderhounds.entity.ai.EntityAIWatchLeader;
 import com.google.common.base.Predicate;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -11,17 +13,16 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.*;
 import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
+
+import static com.fredtargaryen.enderhounds.EnderhoundsBase.LEADCAP;
 
 public abstract class EntityEnderhound extends EntityMob implements Comparable<EntityEnderhound>
 {
@@ -90,24 +91,19 @@ public abstract class EntityEnderhound extends EntityMob implements Comparable<E
     public Power power;
     protected boolean isShaking;
     private ArrayList<EntityEnderhound> nearbyHounds = new ArrayList<EntityEnderhound>();
-    private EntityEnderhound leader = null;
+    private EntityLivingBase leader = null;
 
     public EntityEnderhound(World world)
     {
         super(world);
-        this.getNearbyHounds();
-        this.resetAllegiance();
+        this.refreshLeader();
         this.stepHeight = 1.0F;
-        this.tasks.addTask(0, new EntityAISwimming(this));
-        this.tasks.addTask(2, new EntityAIAttackMelee(this, 1.0D, false));
-        this.tasks.addTask(7, new EntityAIWander(this, 1.0D));
-        this.tasks.addTask(8, new EntityAIWatchLeader(this));
-        //TODO AI for following leaders
-        this.tasks.addTask(8, new EntityAILookIdle(this));
-        //TODO AI for getting hurt (reference: EntityAIHurtByTarget)
-        //TODO AI for ranged powers and jumping at targets when close
-        //TODO AI for finding a player (reference: EntityEnderman.AIFindPlayer)
-        this.targetTasks.addTask(3, new EntityAINearestAttackableTarget(this, EntityEndermite.class, 10, true, false, new Predicate()
+        this.tasks.addTask(0, new EntityAIAttackMelee(this, 1.0D, false));
+        this.tasks.addTask(1, new EntityAIWander(this, 1.0D));
+        this.tasks.addTask(2, new EntityAIWatchLeader(this));
+        this.tasks.addTask(3, new EntityAIPackLogic(this));
+        this.tasks.addTask(4, new EntityAILookIdle(this));
+        this.targetTasks.addTask(4, new EntityAINearestAttackableTarget(this, EntityEndermite.class, 10, true, false, new Predicate()
         {
             public boolean func_179948_a(EntityEndermite p_179948_1_)
             {
@@ -135,23 +131,40 @@ public abstract class EntityEnderhound extends EntityMob implements Comparable<E
     {
         for(EntityEnderhound e : this.nearbyHounds)
         {
-            e.getNearbyHounds();
+            e.refreshNearbyHounds();
         }
     }
 
     /**
-     * Decides the leader to follow based on the strength of all nearby Enderhounds (see compareTo).
-     * TODO Later, should be able to follow humans and Enderman as well.
+     * Decides the leader to follow based on the strength of all Enderhounds in area (see compareTo).
      */
-    private void resetAllegiance()
+    public void refreshLeader()
     {
+        EntityEnderhound strongestHound = null;
+        this.refreshNearbyHounds();
         Collections.sort(this.nearbyHounds);
-        if(this.nearbyHounds.size() > 0) {
-            this.leader = this.nearbyHounds.get(this.nearbyHounds.size() - 1);
+        //There will be at least one Enderhound (this)
+        //Strongest hound around is at bottom of list (could be itself)
+        strongestHound = this.nearbyHounds.get(this.nearbyHounds.size() - 1);
+        //Leader implicitly has ILeadPackCapability
+        if(this.leader == null)
+        {
+            if(strongestHound != this)
+            {
+                this.leader = strongestHound;
+            }
         }
         else
         {
-            this.leader = null;
+            if (!this.leader.getCapability(LEADCAP, EnumFacing.UP).isStrongerThan(strongestHound))
+            {
+                if(strongestHound == this) {
+                    this.leader = null;
+                }
+                else {
+                    this.leader = strongestHound;
+                }
+            }
         }
     }
 
@@ -166,9 +179,9 @@ public abstract class EntityEnderhound extends EntityMob implements Comparable<E
     }
 
     /**
-     * Assembles a list of all nearby Enderhounds within an area around this Enderhound.
+     * Assembles a list of all Enderhounds within an area around this Enderhound (including this Enderhound).
      */
-    protected void getNearbyHounds()
+    private void refreshNearbyHounds()
     {
         this.nearbyHounds.clear();
         for(Object o : this.world.getEntitiesWithinAABB(EntityEnderhound.class,
@@ -236,36 +249,6 @@ public abstract class EntityEnderhound extends EntityMob implements Comparable<E
         }
     }
 
-    public class EntityAIWatchLeader extends EntityAIBase
-    {
-        private EntityEnderhound watcher;
-
-        public EntityAIWatchLeader(EntityEnderhound watcher)
-        {
-            this.watcher = watcher;
-            //Set to 2 so that the hound can't watch the nearest entity and the leader at the same time
-            this.setMutexBits(2);
-        }
-
-        @Override
-        public boolean shouldExecute() {
-            return this.watcher.getLeader() != null;
-        }
-
-        @Override
-        public boolean continueExecuting()
-        {
-            return this.shouldExecute() && this.watcher.getLeader().isEntityAlive();
-        }
-
-        @Override
-        public void updateTask()
-        {
-            EntityLivingBase leader = this.watcher.getLeader();
-            this.watcher.getLookHelper().setLookPosition(leader.posX, leader.posY + (double)leader.getEyeHeight(), leader.posZ, 10.0F, (float)watcher.getVerticalFaceSpeed());
-        }
-    }
-
     /**
      * Called frequently so the entity can update its state every tick as required. For example, zombies and skeletons
      * use this to react to sunlight and start to burn.
@@ -299,11 +282,10 @@ public abstract class EntityEnderhound extends EntityMob implements Comparable<E
      * Applies the given player interaction to this Entity.
      */
     @Override
-    public boolean processInteract(EntityPlayer player, EnumHand hand)
+    protected boolean processInteract(EntityPlayer player, EnumHand hand)
     {
         this.setAttackTarget(this.getAttackTarget() == null ? player : null);
-
-        return super.processInteract(player, hand);
+        return true;
     }
 
     @Override
@@ -372,7 +354,7 @@ public abstract class EntityEnderhound extends EntityMob implements Comparable<E
     //Simple getters
     public boolean isShaking() { return this.isShaking; }
 
-    public EntityEnderhound getLeader() { return this.leader; }
+    public EntityLivingBase getLeader() { return this.leader; }
 
     public float getEyeHeight()
     {

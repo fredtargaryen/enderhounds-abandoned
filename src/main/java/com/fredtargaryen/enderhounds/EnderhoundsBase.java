@@ -1,11 +1,14 @@
 /**
  * TODO
- * Angry ear rotation
- * They walk too fast
- * Make ears slightly thiccer to avoid "see-through" problem (may not work)
- * AI (see EntityEnderhound constructor)
+ * Angry ear rotation(1)
+ * Do pups walk too fast? (2)
+ * AI for following leaders
  * Fix hitboxes
  * Fix eye heights (see GrowthStage)
+ * Less particles when less healthy
+ * Regen (function of light level and y coord)
+ * AI for getting hit
+ * AI for ranged powers
  * Pelt
  * Armour
  * Humans and Endermen as leaders
@@ -32,15 +35,26 @@
 package com.fredtargaryen.enderhounds;
 
 import com.fredtargaryen.enderhounds.entity.*;
+import com.fredtargaryen.enderhounds.entity.capability.ILeadPackCapability;
 import com.fredtargaryen.enderhounds.proxy.CommonProxy;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EnumCreatureType;
+import net.minecraft.entity.monster.EntityEnderman;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.CapabilityInject;
+import net.minecraftforge.common.capabilities.ICapabilitySerializable;
+import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 
 @Mod(modid=DataReference.MODID, name=DataReference.MODNAME, version=DataReference.VERSION)
@@ -101,5 +115,48 @@ public class EnderhoundsBase
     @Mod.EventHandler
     public void postInit(FMLPostInitializationEvent event)
     {
+    }
+
+    ////////////////
+    //CAPABILITIES//
+    ////////////////
+
+    /**
+     * Allows the given entity to lead a pack of Enderhounds
+     */
+    @CapabilityInject(ILeadPackCapability.class)
+    public static final Capability<ILeadPackCapability> LEADCAP = null;
+
+    @SubscribeEvent
+    public void addCapsToNewEntity(AttachCapabilitiesEvent.Entity evt) {
+        Entity e = evt.getEntity();
+        if (e instanceof EntityPlayer || e instanceof EntityEnderhound || e instanceof EntityEnderman) {
+            evt.addCapability(DataReference.LEAD_CAP_LOCATION,
+                    //Full name ICapabilitySerializableProvider
+                    new ICapabilitySerializable<NBTTagCompound>() {
+                        ILeadPackCapability inst = LEADCAP.getDefaultInstance();
+
+                        @Override
+                        public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
+                            return capability == LEADCAP;
+                        }
+
+                        @Override
+                        public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
+                            return capability == LEADCAP ? LEADCAP.<T>cast(inst) : null;
+                        }
+
+                        @Override
+                        public NBTTagCompound serializeNBT() {
+                            return (NBTTagCompound) LEADCAP.getStorage().writeNBT(LEADCAP, inst, null);
+                        }
+
+                        @Override
+                        public void deserializeNBT(NBTTagCompound nbt) {
+                            LEADCAP.getStorage().readNBT(LEADCAP, inst, null, nbt);
+                        }
+                    }
+            );
+        }
     }
 }
