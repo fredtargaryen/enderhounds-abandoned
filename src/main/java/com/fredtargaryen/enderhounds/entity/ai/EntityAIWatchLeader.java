@@ -7,6 +7,7 @@ import net.minecraft.entity.ai.EntityAIBase;
 public class EntityAIWatchLeader extends EntityAIBase
 {
     private EntityEnderhound watcher;
+    private EntityLivingBase leader;
 
     public EntityAIWatchLeader(EntityEnderhound watcher)
     {
@@ -17,19 +18,19 @@ public class EntityAIWatchLeader extends EntityAIBase
 
     @Override
     public boolean shouldExecute() {
-        return this.watcher.getLeader() != null;
+        this.leader = this.watcher.getLeader();
+        return this.leader != null;
     }
 
     @Override
     public boolean continueExecuting()
     {
-        return this.shouldExecute() && this.watcher.getLeader().isEntityAlive();
+        return this.shouldExecute() && this.leader.isEntityAlive();
     }
 
     @Override
     public void updateTask()
     {
-        EntityLivingBase leader = this.watcher.getLeader();
         this.watcher.getLookHelper().setLookPosition(leader.posX, leader.posY + (double)leader.getEyeHeight(), leader.posZ, 10.0F, (float)watcher.getVerticalFaceSpeed());
     }
 }

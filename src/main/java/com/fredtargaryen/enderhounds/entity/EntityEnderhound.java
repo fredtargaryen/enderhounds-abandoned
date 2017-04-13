@@ -96,7 +96,6 @@ public abstract class EntityEnderhound extends EntityMob implements Comparable<E
     public EntityEnderhound(World world)
     {
         super(world);
-        this.refreshLeader();
         this.stepHeight = 1.0F;
         this.tasks.addTask(0, new EntityAIAttackMelee(this, 1.0D, false));
         this.tasks.addTask(1, new EntityAIWander(this, 1.0D));
@@ -140,12 +139,11 @@ public abstract class EntityEnderhound extends EntityMob implements Comparable<E
      */
     public void refreshLeader()
     {
-        EntityEnderhound strongestHound = null;
         this.refreshNearbyHounds();
         Collections.sort(this.nearbyHounds);
-        //There will be at least one Enderhound (this)
-        //Strongest hound around is at bottom of list (could be itself)
-        strongestHound = this.nearbyHounds.get(this.nearbyHounds.size() - 1);
+        //this.nearbyHounds will at least contain this
+        //Strongest hound around is at bottom of list (could be this)
+        EntityEnderhound strongestHound = this.nearbyHounds.get(this.nearbyHounds.size() - 1);
         //Leader implicitly has ILeadPackCapability
         if(this.leader == null)
         {

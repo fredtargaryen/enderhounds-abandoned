@@ -8,9 +8,9 @@ import net.minecraft.entity.EntityLivingBase;
 import java.util.concurrent.Callable;
 
 /**
- * The implementation of ILeadPackCapability for all official Rocket Squids.
- * This implementation was designed for exclusive use with this mod;
- * correct operation is not guaranteed in any other context!
+ * The default implementation of ILeadPackCapability.
+ * Feel free to use this capability if you want your custom mob to be able
+ * to lead a pack of Enderhounds!
  */
 public class DefaultLeadImplFactory implements Callable<ILeadPackCapability>
 {

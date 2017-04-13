@@ -1,6 +1,6 @@
 /**
  * TODO
- * Angry ear rotation(1)
+ * Ear_R only mirrored in Techne
  * Do pups walk too fast? (2)
  * AI for following leaders
  * Fix hitboxes
@@ -35,7 +35,9 @@
 package com.fredtargaryen.enderhounds;
 
 import com.fredtargaryen.enderhounds.entity.*;
+import com.fredtargaryen.enderhounds.entity.capability.DefaultLeadImplFactory;
 import com.fredtargaryen.enderhounds.entity.capability.ILeadPackCapability;
+import com.fredtargaryen.enderhounds.entity.capability.LeadCapStorage;
 import com.fredtargaryen.enderhounds.proxy.CommonProxy;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
@@ -45,8 +47,10 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
+import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -75,6 +79,10 @@ public class EnderhoundsBase
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event)
     {
+        //Register Capabilities
+        CapabilityManager.INSTANCE.register(ILeadPackCapability.class, new LeadCapStorage(), new DefaultLeadImplFactory());
+        MinecraftForge.EVENT_BUS.register(this);
+
         //Makes all packets to be used
         //PacketHandler.init();
 

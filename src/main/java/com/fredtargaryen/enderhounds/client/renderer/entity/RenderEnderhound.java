@@ -36,7 +36,7 @@ public class RenderEnderhound extends RenderLiving<EntityEnderhound>
     {
         if (entity.isShaking())
         {
-            double d3 = 0.02D;
+            double d3 = 0.04D;
             x += this.rnd.nextGaussian() * d3;
             z += this.rnd.nextGaussian() * d3;
         }
