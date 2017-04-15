@@ -163,7 +163,7 @@ public class ModelEnderhoundPup extends ModelBase
             Jaw_Membrane.setRotationPoint(0F, 10.7F, -9F);
         }
         Body1.render(scale);
-        Head.render(((EntityEnderhoundPup) entity).getLeader() == null ? scale : scale / 2);
+        Head.render(scale);
         Body2.render(scale);
         Body3.render(scale);
         Ear_L.render(scale);

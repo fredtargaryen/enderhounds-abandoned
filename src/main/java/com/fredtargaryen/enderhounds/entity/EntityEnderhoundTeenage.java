@@ -38,6 +38,7 @@ public class EntityEnderhoundTeenage extends EntityEnderhound
     {
         this(pup.world);
         this.setHealth(this.getMaxHealth() * pup.getHealth() / pup.getMaxHealth());
+        this.leader = pup.leader;
     }
 
     @Override

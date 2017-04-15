@@ -14,8 +14,10 @@ public class DataReference
     public static final String CLIENTPROXYPATH = "com.fredtargaryen.enderhounds.proxy.ClientProxy";
     public static final String SERVERPROXYPATH = "com.fredtargaryen.enderhounds.proxy.ServerProxy";
 
-    public static final double HERDRANGEXZ = 30;
-    public static final double HERDRANGEY = 30;
+    public static final double HERDRANGEXZ = 10;
+    public static final double HERDRANGEY = 10;
+    public static final double HERDRANGEMAXDIST = Math.sqrt(HERDRANGEXZ * HERDRANGEXZ + HERDRANGEY * HERDRANGEY);
+    public static final double HERDRANGEFOLLOWDIST = HERDRANGEMAXDIST / 2;
 
     public static final ResourceLocation LEAD_CAP_LOCATION = new ResourceLocation(DataReference.MODID, "ILeadPackCapability");
 }

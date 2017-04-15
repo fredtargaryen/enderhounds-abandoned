@@ -2,23 +2,22 @@ package com.fredtargaryen.enderhounds.entity;
 
 import com.fredtargaryen.enderhounds.DataReference;
 import com.fredtargaryen.enderhounds.entity.ai.EntityAIPackLogic;
-import com.fredtargaryen.enderhounds.entity.ai.EntityAIWatchLeader;
+import com.fredtargaryen.enderhounds.entity.ai.EntityAIFollowLeader;
 import com.google.common.base.Predicate;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.*;
 import net.minecraft.entity.monster.EntityEndermite;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.*;
 import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -29,10 +28,10 @@ public abstract class EntityEnderhound extends EntityMob implements Comparable<E
     public enum GrowthStage
     {
         //TODO Correct eye heights
-        PUP(0, 0.45F),
-        TEENAGE(1, 0.0F),
-        MATURE(3, 0.0F),
-        ELDERLY(2, 0.0F);
+        PUP(0, 0.45F, 3),
+        TEENAGE(1, 0.0F, 5),
+        MATURE(3, 0.0F, 9),
+        ELDERLY(2, 0.0F, 7);
 
         /**
          * Shows which growth stage is strongest, for Enderhound strength comparison.
@@ -40,16 +39,19 @@ public abstract class EntityEnderhound extends EntityMob implements Comparable<E
          */
         private final int strengthLevel;
         private final float eyeHeight;
+        private final int averageTPLength;
 
-        GrowthStage(int strengthLevel, float eyeHeight)
+        GrowthStage(int strengthLevel, float eyeHeight, int averTPLen)
         {
             this.strengthLevel = strengthLevel;
             this.eyeHeight = eyeHeight;
+            this.averageTPLength = averTPLen;
         }
 
         //Getters below here
         public int getStrengthLevel(){return strengthLevel;}
         public float getEyeHeight(){ return eyeHeight;}
+        public int getAverageTPLength() { return averageTPLength; }
     }
 
     public enum Personality
@@ -91,17 +93,16 @@ public abstract class EntityEnderhound extends EntityMob implements Comparable<E
     public Power power;
     protected boolean isShaking;
     private ArrayList<EntityEnderhound> nearbyHounds = new ArrayList<EntityEnderhound>();
-    private EntityLivingBase leader = null;
+    protected EntityLivingBase leader = null;
 
     public EntityEnderhound(World world)
     {
         super(world);
         this.stepHeight = 1.0F;
         this.tasks.addTask(0, new EntityAIAttackMelee(this, 1.0D, false));
-        this.tasks.addTask(1, new EntityAIWander(this, 1.0D));
-        this.tasks.addTask(2, new EntityAIWatchLeader(this));
+        this.tasks.addTask(1, new EntityAIFollowLeader(this));
+        this.tasks.addTask(2, new EntityAIWander(this, 1.0D));
         this.tasks.addTask(3, new EntityAIPackLogic(this));
-        this.tasks.addTask(4, new EntityAILookIdle(this));
         this.targetTasks.addTask(4, new EntityAINearestAttackableTarget(this, EntityEndermite.class, 10, true, false, new Predicate()
         {
             public boolean func_179948_a(EntityEndermite p_179948_1_)
@@ -347,6 +348,67 @@ public abstract class EntityEnderhound extends EntityMob implements Comparable<E
                 break;
         }
         return nbt;
+    }
+
+    /**
+     * x, y and z are of the ultimate target. This will do a single TP roughly towards it, covering roughly the jump
+     * length of the Enderhound.
+     */
+    public void singleTP(double x, double y, double z)
+    {
+        double angleTowardsPoint = Math.atan2(z - this.posZ, x - this.posX);
+        angleTowardsPoint += this.rand.nextBoolean() ? Math.PI / 4 : -Math.PI / 4;
+        angleTowardsPoint += this.rand.nextBoolean() ? Math.PI / 8 : -Math.PI / 8;
+        int jumpDist = this.stage.getAverageTPLength();
+        this.attemptTeleport(x + jumpDist * Math.cos(angleTowardsPoint), y, z + jumpDist * Math.sin(angleTowardsPoint));
+    }
+
+    public boolean attackEntityFrom(DamageSource source, float amount)
+    {
+        super.attackEntityFrom(source, amount);
+        Entity e = source.getEntity();
+        if(e instanceof EntityLivingBase)
+        {
+            this.setAttackTarget((EntityLivingBase) e);
+            this.pingNewAttackTarget((EntityLivingBase) e);
+        }
+        return true;
+    }
+
+    public void pingNewAttackTarget(EntityLivingBase targ)
+    {
+        for(EntityEnderhound e : this.nearbyHounds)
+        {
+            e.considerNewTarget(this, targ);
+        }
+    }
+
+    public void considerNewTarget(EntityEnderhound caller, EntityLivingBase targ)
+    {
+        if(this.leader == null)
+        {
+            if(caller.isFollowingMe(this))
+            {
+                if (this.getAttackTarget() == null)
+                {
+                    this.setAttackTarget(targ);
+                }
+            }
+        }
+        else
+        {
+            if(caller == this.leader)
+            {
+                this.setAttackTarget(targ);
+            }
+            else
+            {
+                if(caller.leader == this.leader && this.getAttackTarget() == null)
+                {
+                    this.setAttackTarget(targ);
+                }
+            }
+        }
     }
 
     //Simple getters

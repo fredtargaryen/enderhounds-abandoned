@@ -1,8 +1,7 @@
 /**
  * TODO
- * Ear_R only mirrored in Techne
- * Do pups walk too fast? (2)
- * AI for following leaders
+ * (EntityAIFollowLeader) Doesn't seem to attempt teleport (check)
+ * --What about uneven ground
  * Fix hitboxes
  * Fix eye heights (see GrowthStage)
  * Less particles when less healthy
@@ -12,6 +11,7 @@
  * Pelt
  * Armour
  * Humans and Endermen as leaders
+ * Sound
  * Banner
  *
  * Other notes:

@@ -6,6 +6,7 @@ import net.minecraft.entity.ai.EntityAIBase;
 public class EntityAIPackLogic extends EntityAIBase
 {
     private EntityEnderhound hound;
+    private short ticksUntilRefreshLeader = 100;
 
     public EntityAIPackLogic(EntityEnderhound hound)
     {
@@ -26,6 +27,14 @@ public class EntityAIPackLogic extends EntityAIBase
     @Override
     public void updateTask()
     {
-        this.hound.refreshLeader();
+        if(this.ticksUntilRefreshLeader > 0)
+        {
+            --this.ticksUntilRefreshLeader;
+        }
+        else
+        {
+            this.ticksUntilRefreshLeader = 1200;
+            this.hound.refreshLeader();
+        }
     }
 }
