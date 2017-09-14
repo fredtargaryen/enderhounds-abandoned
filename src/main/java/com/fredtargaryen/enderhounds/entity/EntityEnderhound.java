@@ -27,11 +27,11 @@ public abstract class EntityEnderhound extends EntityMob implements Comparable<E
 {
     public enum GrowthStage
     {
-        //TODO Correct eye heights
-        PUP(0, 0.45F, 3),
-        TEENAGE(1, 0.0F, 5),
-        MATURE(3, 0.0F, 9),
-        ELDERLY(2, 0.0F, 7);
+        //TODO Correct eye heights and hitboxes
+        PUP(0, 1.1F, 3, 0.5F, 1.0F),
+        TEENAGE(1, 0.0F, 5, 0.5F, 1.0F),
+        MATURE(3, 0.0F, 9, 0.5F, 1.0F),
+        ELDERLY(2, 0.0F, 7, 0.5F, 1.0F);
 
         /**
          * Shows which growth stage is strongest, for Enderhound strength comparison.
@@ -40,18 +40,24 @@ public abstract class EntityEnderhound extends EntityMob implements Comparable<E
         private final int strengthLevel;
         private final float eyeHeight;
         private final int averageTPLength;
+        private final float bBoxWidth;
+        private final float bBoxHeight;
 
-        GrowthStage(int strengthLevel, float eyeHeight, int averTPLen)
+        GrowthStage(int strengthLevel, float eyeHeight, int averTPLen, float width, float height)
         {
             this.strengthLevel = strengthLevel;
             this.eyeHeight = eyeHeight;
             this.averageTPLength = averTPLen;
+            this.bBoxWidth = width;
+            this.bBoxHeight = height;
         }
 
         //Getters below here
         public int getStrengthLevel(){return strengthLevel;}
         public float getEyeHeight(){ return eyeHeight;}
         public int getAverageTPLength() { return averageTPLength; }
+        public float getBoxWidth() { return bBoxWidth; }
+        public float getBoxHeight() { return bBoxHeight; }
     }
 
     public enum Personality
@@ -98,6 +104,7 @@ public abstract class EntityEnderhound extends EntityMob implements Comparable<E
     public EntityEnderhound(World world)
     {
         super(world);
+        this.setSize(this.stage.getBoxWidth(), this.stage.getBoxHeight());
         this.stepHeight = 1.0F;
         this.tasks.addTask(0, new EntityAIAttackMelee(this, 1.0D, false));
         this.tasks.addTask(1, new EntityAIFollowLeader(this));
@@ -366,7 +373,7 @@ public abstract class EntityEnderhound extends EntityMob implements Comparable<E
     public boolean attackEntityFrom(DamageSource source, float amount)
     {
         super.attackEntityFrom(source, amount);
-        Entity e = source.getEntity();
+        Entity e = source.getTrueSource();
         if(e instanceof EntityLivingBase)
         {
             this.setAttackTarget((EntityLivingBase) e);

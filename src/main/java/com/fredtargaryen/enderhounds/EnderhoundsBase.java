@@ -1,9 +1,9 @@
 /**
  * TODO
- * (EntityAIFollowLeader) Doesn't seem to attempt teleport (check)
- * --What about uneven ground
- * Fix hitboxes
- * Fix eye heights (see GrowthStage)
+ * (EntityAIFollowLeader) Teleporting on uneven ground (check)
+ * Fix hitboxes (check 1)
+ * Fix eye heights (check 1)
+ *
  * Less particles when less healthy
  * Regen (function of light level and y coord)
  * AI for getting hit
@@ -39,14 +39,19 @@ import com.fredtargaryen.enderhounds.entity.capability.DefaultLeadImplFactory;
 import com.fredtargaryen.enderhounds.entity.capability.ILeadPackCapability;
 import com.fredtargaryen.enderhounds.entity.capability.LeadCapStorage;
 import com.fredtargaryen.enderhounds.proxy.CommonProxy;
+import com.google.common.collect.Iterators;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.monster.EntityEnderman;
+import net.minecraft.entity.passive.EntitySheep;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Biomes;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.biome.Biome;
+import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
@@ -60,6 +65,11 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 @Mod(modid=DataReference.MODID, name=DataReference.MODNAME, version=DataReference.VERSION)
 public class EnderhoundsBase
@@ -89,10 +99,13 @@ public class EnderhoundsBase
         //Makes all items to be used
 
         //Registering items
-        //GameRegistry.registerItem(floopowder1t, "floopowder_one");
 
-        //Adding recipes
+        proxy.registerRenderers();
+    }
 
+    @Mod.EventHandler
+    public void init(FMLInitializationEvent event)
+    {
         //Register Entities with EntityRegistry
         //Last three params are for tracking: trackingRange, updateFrequency and sendsVelocityUpdates
         ResourceLocation pupRL = new ResourceLocation(DataReference.MODID+":pup");
@@ -105,18 +118,24 @@ public class EnderhoundsBase
         EntityRegistry.registerEgg(pupRL, 0, 1447446);
 
         //Add spawns
-        EntityRegistry.addSpawn(EntityEnderhoundPup.class, 100, 1, 1, EnumCreatureType.MONSTER);
+        EntityRegistry.addSpawn(EntityEnderhoundPup.class, 100, 4, 4, EnumCreatureType.CREATURE, Biomes.BIRCH_FOREST,
+                Biomes.BIRCH_FOREST_HILLS, Biomes.COLD_TAIGA, Biomes.COLD_TAIGA_HILLS, Biomes.DESERT,
+                Biomes.DESERT_HILLS, Biomes.DESERT_HILLS, Biomes.EXTREME_HILLS, Biomes.EXTREME_HILLS_EDGE,
+                Biomes.EXTREME_HILLS_WITH_TREES, Biomes.FOREST_HILLS, Biomes.HELL, Biomes.ICE_MOUNTAINS,
+                Biomes.ICE_PLAINS, Biomes.MESA, Biomes.MESA_CLEAR_ROCK, Biomes.MESA_ROCK, Biomes.MUTATED_BIRCH_FOREST,
+                Biomes.MUTATED_BIRCH_FOREST_HILLS, Biomes.MUTATED_DESERT, Biomes.MUTATED_EXTREME_HILLS,
+                Biomes.MUTATED_EXTREME_HILLS_WITH_TREES, Biomes.MUTATED_FOREST, Biomes.MUTATED_ICE_FLATS,
+                Biomes.MUTATED_MESA, Biomes.MUTATED_MESA_CLEAR_ROCK, Biomes.MUTATED_MESA_ROCK, Biomes.MUTATED_PLAINS,
+                Biomes.MUTATED_REDWOOD_TAIGA, Biomes.MUTATED_REDWOOD_TAIGA_HILLS, Biomes.MUTATED_ROOFED_FOREST,
+                Biomes.MUTATED_SAVANNA, Biomes.MUTATED_SAVANNA_ROCK, Biomes.MUTATED_SWAMPLAND, Biomes.MUTATED_TAIGA,
+                Biomes.MUTATED_TAIGA_COLD, Biomes.PLAINS, Biomes.REDWOOD_TAIGA, Biomes.REDWOOD_TAIGA_HILLS,
+                Biomes.ROOFED_FOREST, Biomes.SAVANNA, Biomes.SAVANNA_PLATEAU, Biomes.STONE_BEACH, Biomes.SWAMPLAND,
+                Biomes.TAIGA, Biomes.TAIGA_HILLS, Biomes.VOID);
         //EntityRegistry.addSpawn(EntityEnderhoundPup.class, 4, 1, 3, EnumCreatureType.MONSTER);
         //EntityRegistry.addSpawn(EntityEnderhoundTeenage.class, 3, 1, 3, EnumCreatureType.MONSTER);
         //EntityRegistry.addSpawn(EntityEnderhoundMature.class, 2, 1, 3, EnumCreatureType.MONSTER);
         //EntityRegistry.addSpawn(EntityEnderhoundElderly.class, 1, 1, 3, EnumCreatureType.MONSTER);
 
-        proxy.registerRenderers();
-    }
-
-    @Mod.EventHandler
-    public void load(FMLInitializationEvent event)
-    {
         proxy.registerModels();
     }
 
@@ -136,8 +155,8 @@ public class EnderhoundsBase
     public static final Capability<ILeadPackCapability> LEADCAP = null;
 
     @SubscribeEvent
-    public void addCapsToNewEntity(AttachCapabilitiesEvent.Entity evt) {
-        Entity e = evt.getEntity();
+    public void addCapsToNewEntity(AttachCapabilitiesEvent<Entity> evt) {
+        Entity e = evt.getObject();
         if (e instanceof EntityPlayer || e instanceof EntityEnderhound || e instanceof EntityEnderman) {
             evt.addCapability(DataReference.LEAD_CAP_LOCATION,
                     //Full name ICapabilitySerializableProvider

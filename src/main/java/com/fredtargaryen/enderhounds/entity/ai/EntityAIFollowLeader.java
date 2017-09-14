@@ -24,7 +24,7 @@ public class EntityAIFollowLeader extends EntityAIBase
     }
 
     @Override
-    public boolean continueExecuting()
+    public boolean shouldContinueExecuting()
     {
         this.distanceFromLeader = this.follower.getDistance(this.leader.posX, this.leader.posY, this.leader.posZ);
         return this.leader.isEntityAlive() && this.distanceFromLeader > DataReference.HERDRANGEFOLLOWDIST;

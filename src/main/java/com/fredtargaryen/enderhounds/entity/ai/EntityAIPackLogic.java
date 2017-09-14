@@ -19,7 +19,7 @@ public class EntityAIPackLogic extends EntityAIBase
     }
 
     @Override
-    public boolean continueExecuting()
+    public boolean shouldContinueExecuting()
     {
         return this.shouldExecute();
     }
