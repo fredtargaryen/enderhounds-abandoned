@@ -1,24 +1,27 @@
 # eclipse
-bin
+.classpath
 *.launch
 .settings
 .metadata
-.classpath
 .project
+bin
 
 # idea
-out
+.idea
+*.iml
 *.ipr
 *.iws
-*.iml
-.idea
+out
 
 # gradle
-gradle
 build
 .gradle
+gradle
+gradle.properties
+gradlew
+gradlew.bat
 
 # other
-classes*
+classes
 eclipse
 run
