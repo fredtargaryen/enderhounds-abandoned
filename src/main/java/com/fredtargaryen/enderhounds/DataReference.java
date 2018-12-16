@@ -8,7 +8,7 @@ import net.minecraft.util.ResourceLocation;
 public class DataReference
 {
     public static final String MODNAME = "Enderhounds";
-    public static final String MODID = "ftenderhounds";
+    public static final String MODID = "enderhoundsft";
     public static final String VERSION = "0.1";
 
     public static final String CLIENTPROXYPATH = "com.fredtargaryen.enderhounds.proxy.ClientProxy";
