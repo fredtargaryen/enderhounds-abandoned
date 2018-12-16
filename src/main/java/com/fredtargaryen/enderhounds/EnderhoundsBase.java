@@ -39,19 +39,14 @@ import com.fredtargaryen.enderhounds.entity.capability.DefaultLeadImplFactory;
 import com.fredtargaryen.enderhounds.entity.capability.ILeadPackCapability;
 import com.fredtargaryen.enderhounds.entity.capability.LeadCapStorage;
 import com.fredtargaryen.enderhounds.proxy.CommonProxy;
-import com.google.common.collect.Iterators;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.monster.EntityEnderman;
-import net.minecraft.entity.passive.EntitySheep;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Biomes;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.biome.Biome;
-import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
@@ -66,12 +61,10 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import static net.minecraftforge.fml.common.registry.GameRegistry.ObjectHolder;
 
 @Mod(modid=DataReference.MODID, name=DataReference.MODNAME, version=DataReference.VERSION)
+@ObjectHolder(DataReference.MODID)
 public class EnderhoundsBase
 {
     @Mod.Instance(DataReference.MODID)
