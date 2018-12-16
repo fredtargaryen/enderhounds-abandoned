@@ -1,5 +1,6 @@
 /**
  * TODO
+ * Port Pup Techne model to Tabula
  * (EntityAIFollowLeader) Teleporting on uneven ground (check)
  * Fix hitboxes (check 1)
  * Fix eye heights (check 1)
@@ -31,6 +32,11 @@
  * Weak:
  * -Teleports far away on hit
  * -Stares for a long time before attacking
+ *
+ * Powers:
+ * * Ball
+ * * Doppel
+ * * Jaws
  */
 package com.fredtargaryen.enderhounds;
 
