@@ -1,6 +1,6 @@
 package com.fredtargaryen.enderhounds.entity.capability;
 
-import net.minecraft.nbt.NBTBase;
+import net.minecraft.nbt.INBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
@@ -10,11 +10,9 @@ import net.minecraftforge.common.capabilities.Capability;
  * Feel free to use this capability if you want your custom mob to be able
  * to lead a pack of Enderhounds!
  */
-public class LeadCapStorage implements Capability.IStorage<ILeadPackCapability>
-{
+public class LeadCapStorage implements Capability.IStorage<ILeadPackCapability> {
     @Override
-    public NBTBase writeNBT(Capability<ILeadPackCapability> capability, ILeadPackCapability instance, EnumFacing side)
-    {
+    public INBTBase writeNBT(Capability<ILeadPackCapability> capability, ILeadPackCapability instance, EnumFacing side) {
         //NBTTagCompound comp = new NBTTagCompound();
         //comp.setDouble("pitch", instance.getRotPitch());
         //return comp;
@@ -22,8 +20,7 @@ public class LeadCapStorage implements Capability.IStorage<ILeadPackCapability>
     }
 
     @Override
-    public void readNBT(Capability<ILeadPackCapability> capability, ILeadPackCapability instance, EnumFacing side, NBTBase nbt)
-    {
+    public void readNBT(Capability<ILeadPackCapability> capability, ILeadPackCapability instance, EnumFacing side, INBTBase nbt) {
         //NBTTagCompound comp = (NBTTagCompound) nbt;
         //instance.setRotPitch(comp.getDouble("pitch"));
     }

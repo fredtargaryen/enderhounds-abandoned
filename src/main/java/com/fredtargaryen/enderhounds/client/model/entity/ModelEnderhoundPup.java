@@ -1,12 +1,11 @@
 package com.fredtargaryen.enderhounds.client.model.entity;
 
 import com.fredtargaryen.enderhounds.entity.EntityEnderhoundPup;
-import net.minecraft.client.model.ModelBase;
-import net.minecraft.client.model.ModelRenderer;
+import net.minecraft.client.renderer.entity.model.ModelBase;
+import net.minecraft.client.renderer.entity.model.ModelRenderer;
 import net.minecraft.entity.Entity;
 
-public class ModelEnderhoundPup extends ModelBase
-{
+public class ModelEnderhoundPup extends ModelBase {
     ModelRenderer Body1;
     ModelRenderer Head;
     ModelRenderer Body2;
@@ -24,8 +23,7 @@ public class ModelEnderhoundPup extends ModelBase
     ModelRenderer Jaw;
     ModelRenderer Jaw_Membrane;
   
-    public ModelEnderhoundPup()
-    {
+    public ModelEnderhoundPup() {
         textureWidth = 64;
         textureHeight = 32;
     
@@ -126,13 +124,11 @@ public class ModelEnderhoundPup extends ModelBase
         setRotation(Jaw_Membrane, 0F, 0F, 0F);
     }
 
-    public void render(Entity entity, float limbSwingTime, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scale)
-    {
+    public void render(Entity entity, float limbSwingTime, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
         super.render(entity, limbSwingTime, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
         this.setRotationAngles(limbSwingTime, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale, entity);
         EntityEnderhoundPup pup = (EntityEnderhoundPup) entity;
-        if(pup.getAttackTarget() == null)
-        {
+        if(pup.getAttackTarget() == null) {
             Body2.setRotationPoint(0F, 14.7F, 0F);
             Ear_L.setRotationPoint(2.5F, 6.7F, -5F);
             setRotation(Ear_L, 0F, 0.7853982F, 0F);
@@ -144,8 +140,7 @@ public class ModelEnderhoundPup extends ModelBase
             Jaw.setRotationPoint(0F, 9.2F, -9F);
             Jaw_Membrane.setRotationPoint(0F, 11.7F, -4F);
         }
-        else
-        {
+        else {
             //Arch the back, like a cat
             Body2.setRotationPoint(0F, 11.7F, 0F);
             //Fold back ears
@@ -184,8 +179,7 @@ public class ModelEnderhoundPup extends ModelBase
      * Order of rotation for ModelRenderers is Z first, then Y, then X; all relative to the ModelRenderer
      * I don't like it but c'est la vie
      */
-    private void setRotation(ModelRenderer model, float x, float y, float z)
-    {
+    private void setRotation(ModelRenderer model, float x, float y, float z) {
         model.rotateAngleZ = z;
         model.rotateAngleY = y;
         model.rotateAngleX = x;
@@ -194,8 +188,7 @@ public class ModelEnderhoundPup extends ModelBase
     /**
      * @param scale Scale of the model; set to 1 / 16.0F.
      */
-    public void setRotationAngles(float limbSwingTime, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scale, Entity entity)
-    {
+    public void setRotationAngles(float limbSwingTime, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scale, Entity entity) {
         super.setRotationAngles(limbSwingTime, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale, entity);
         Leg_L_F.rotateAngleX = (float) (Math.sin(limbSwingTime * 0.6662F) * 0.524 * limbSwingAmount);
         Leg_R_F.rotateAngleX = -Leg_L_F.rotateAngleX;

@@ -3,19 +3,14 @@ package com.fredtargaryen.enderhounds.client.renderer.entity;
 import com.fredtargaryen.enderhounds.DataReference;
 import com.fredtargaryen.enderhounds.client.model.entity.ModelEnderhoundPup;
 import com.fredtargaryen.enderhounds.entity.EntityEnderhound;
-import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.renderer.entity.RenderLiving;
 import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.monster.EntityEnderman;
+import net.minecraft.client.renderer.entity.model.ModelBase;
 import net.minecraft.util.ResourceLocation;
 
 import java.util.Random;
 
-public class RenderEnderhound extends RenderLiving<EntityEnderhound>
-{
+public class RenderEnderhound extends RenderLiving<EntityEnderhound> {
     private ResourceLocation[] textures = {new ResourceLocation(DataReference.MODID,"textures/models/pup.png")};
                                             //new ResourceLocation(DataReference.MODID+":textures/entity/teenage.png"),
                                             //new ResourceLocation(DataReference.MODID+":textures/entity/mature.png")},

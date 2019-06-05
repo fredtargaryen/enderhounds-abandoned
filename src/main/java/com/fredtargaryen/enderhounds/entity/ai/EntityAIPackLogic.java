@@ -3,8 +3,7 @@ package com.fredtargaryen.enderhounds.entity.ai;
 import com.fredtargaryen.enderhounds.entity.EntityEnderhound;
 import net.minecraft.entity.ai.EntityAIBase;
 
-public class EntityAIPackLogic extends EntityAIBase
-{
+public class EntityAIPackLogic extends EntityAIBase {
     private EntityEnderhound hound;
     private short ticksUntilRefreshLeader = 100;
 
@@ -25,14 +24,11 @@ public class EntityAIPackLogic extends EntityAIBase
     }
 
     @Override
-    public void updateTask()
-    {
-        if(this.ticksUntilRefreshLeader > 0)
-        {
+    public void tick() {
+        if(this.ticksUntilRefreshLeader > 0) {
             --this.ticksUntilRefreshLeader;
         }
-        else
-        {
+        else {
             this.ticksUntilRefreshLeader = 1200;
             this.hound.refreshLeader();
         }

@@ -1,16 +1,16 @@
 package com.fredtargaryen.enderhounds.entity;
 
+import com.fredtargaryen.enderhounds.EnderhoundsBase;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.AbstractAttributeMap;
 import net.minecraft.world.World;
 
-public class EntityEnderhoundElderly extends EntityEnderhound
-{
-    public EntityEnderhoundElderly(World world)
-    {
-        super(world);
+public class EntityEnderhoundElderly extends EntityEnderhound {
+    public EntityEnderhoundElderly(EntityType type, World world) {
+        super(type, world);
         this.stage = GrowthStage.ELDERLY;
-        switch(this.rand.nextInt(2))
-        {
+        switch(this.rand.nextInt(2)) {
             case 0:
                 this.power = Power.BALL;
                 break;
@@ -18,8 +18,7 @@ public class EntityEnderhoundElderly extends EntityEnderhound
                 this.power = Power.DOPPEL;
                 break;
         }
-        switch(this.rand.nextInt(2))
-        {
+        switch(this.rand.nextInt(2)) {
             case 0:
                 this.personality = Personality.WEAK;
                 break;
@@ -31,24 +30,22 @@ public class EntityEnderhoundElderly extends EntityEnderhound
         this.stepHeight = 2.5F;
     }
 
-    public EntityEnderhoundElderly(EntityEnderhoundMature adult)
-    {
-        this(adult.world);
+    public EntityEnderhoundElderly(EntityEnderhoundMature adult) {
+        this(EnderhoundsBase.ELDERLY_TYPE, adult.world);
         this.power = adult.power;
         this.personality = adult.personality;
-        if(this.personality == Personality.AGGRESSIVE)
-        {
+        if(this.personality == Personality.AGGRESSIVE) {
             this.personality = Personality.CUNNING;
         }
         this.setHealth(this.getMaxHealth() * adult.getHealth() / adult.getMaxHealth());
     }
 
     @Override
-    protected void applyEntityAttributes()
-    {
-        super.applyEntityAttributes();
-        this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(25);
-        this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(8.0D);
+    protected void registerAttributes() {
+        super.registerAttributes();
+        AbstractAttributeMap aam = this.getAttributeMap();
+        aam.getAttributeInstance(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(25);
+        aam.getAttributeInstance(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(8.0D);
     }
 
     protected void grow(){}

@@ -1,5 +1,7 @@
 /**
  * TODO
+ * Registering eggs
+ *
  * Port Pup Techne model to Tabula
  * (EntityAIFollowLeader) Teleporting on uneven ground (check)
  * Fix hitboxes (check 1)
@@ -44,8 +46,12 @@ import com.fredtargaryen.enderhounds.entity.*;
 import com.fredtargaryen.enderhounds.entity.capability.DefaultLeadImplFactory;
 import com.fredtargaryen.enderhounds.entity.capability.ILeadPackCapability;
 import com.fredtargaryen.enderhounds.entity.capability.LeadCapStorage;
-import com.fredtargaryen.enderhounds.proxy.CommonProxy;
+import com.fredtargaryen.enderhounds.proxy.ClientProxy;
+import com.fredtargaryen.enderhounds.proxy.IProxy;
+import com.fredtargaryen.enderhounds.proxy.ServerProxy;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntitySpawnPlacementRegistry;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.player.EntityPlayer;
@@ -53,94 +59,97 @@ import net.minecraft.init.Biomes;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.gen.Heightmap;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.registry.EntityRegistry;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.registries.ObjectHolder;
 
-import static net.minecraftforge.fml.common.registry.GameRegistry.ObjectHolder;
-
-@Mod(modid=DataReference.MODID, name=DataReference.MODNAME, version=DataReference.VERSION)
+@Mod(value=DataReference.MODID)
 @ObjectHolder(DataReference.MODID)
-public class EnderhoundsBase
-{
-    @Mod.Instance(DataReference.MODID)
-    public static EnderhoundsBase instance;
+public class EnderhoundsBase {
+    //Declare EntityTypes here
+    @ObjectHolder("pup")
+    public static EntityType PUP_TYPE;
+    @ObjectHolder("teenage")
+    public static EntityType TEENAGE_TYPE;
+    @ObjectHolder("mature")
+    public static EntityType MATURE_TYPE;
+    @ObjectHolder("elderly")
+    public static EntityType ELDERLY_TYPE;
 
-    /**
-     * Declare all items here
-     */
-    /**
-     * Says where the client and server 'proxy' code is loaded.
-     */
-    @SidedProxy(clientSide= DataReference.CLIENTPROXYPATH, serverSide= DataReference.SERVERPROXYPATH)
-    public static CommonProxy proxy;
+    //Declare all items here
 
-    @Mod.EventHandler
-    public void preInit(FMLPreInitializationEvent event)
-    {
-        //Register Capabilities
-        CapabilityManager.INSTANCE.register(ILeadPackCapability.class, new LeadCapStorage(), new DefaultLeadImplFactory());
+    // Says where the client and server 'proxy' code is loaded.
+    private static IProxy proxy = DistExecutor.runForDist(() -> () -> new ClientProxy(), () -> () -> new ServerProxy());
+
+    public EnderhoundsBase() {
+        //Register the config
+        //ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, Config.SERVER_CONFIG_SPEC);
+
+        //Event bus
+        IEventBus loadingBus = FMLJavaModLoadingContext.get().getModEventBus();
+        // Register the setup method for modloading
+        loadingBus.addListener(this::postRegistration);
+
+        // Register ourselves for server, registry and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
 
-        //Makes all packets to be used
-        //PacketHandler.init();
-
-        //Makes all items to be used
-
-        //Registering items
-
-        proxy.registerRenderers();
+        //Load the config
+        //Config.loadConfig(FMLPaths.CONFIGDIR.get().resolve(DataReference.MODID + ".toml"));
     }
 
-    @Mod.EventHandler
-    public void init(FMLInitializationEvent event)
-    {
-        //Register Entities with EntityRegistry
-        //Last three params are for tracking: trackingRange, updateFrequency and sendsVelocityUpdates
-        ResourceLocation pupRL = new ResourceLocation(DataReference.MODID+":pup");
-        EntityRegistry.registerModEntity(pupRL, EntityEnderhoundPup.class, "enderhound0", 0, instance, 64, 10, true);
-        EntityRegistry.registerModEntity(new ResourceLocation(DataReference.MODID+":teenage"), EntityEnderhoundTeenage.class, "enderhound1", 1, instance, 64, 10, true);
-        EntityRegistry.registerModEntity(new ResourceLocation(DataReference.MODID+":mature"), EntityEnderhoundMature.class, "enderhound2", 2, instance, 64, 10, true);
-        EntityRegistry.registerModEntity(new ResourceLocation(DataReference.MODID+":elderly"), EntityEnderhoundElderly.class, "enderhound3", 3, instance, 64, 10, true);
+    @SubscribeEvent
+    public static void registerEntities(RegistryEvent.Register<EntityType<?>> event) {
+        event.getRegistry().registerAll(
+                EntityType.Builder.create(EntityEnderhoundPup.class, EntityEnderhoundPup::new)
+                        .tracker(64, 10, true)
+                        .build(DataReference.MODID)
+                        .setRegistryName("pup")
+//                EntityType.Builder.create(EntityEnderhoundTeenage.class, EntityEnderhoundTeenage::new)
+//                        .tracker(64, 10, true)
+//                        .build(DataReference.MODID)
+//                        .setRegistryName("teenage"),
+//                EntityType.Builder.create(EntityEnderhoundMature.class, EntityEnderhoundMature::new)
+//                        .tracker(64, 10, true)
+//                        .build(DataReference.MODID)
+//                        .setRegistryName("mature"),
+//                EntityType.Builder.create(EntityEnderhoundElderly.class, EntityEnderhoundElderly::new)
+//                        .tracker(64, 10, true)
+//                        .build(DataReference.MODID)
+//                        .setRegistryName("elderly")
+        );
+    }
 
-        //Change egg colour one day
-        EntityRegistry.registerEgg(pupRL, 0, 1447446);
+    /**
+     * Called after all registry events. Runs in parallel with other SetupEvent handlers.
+     * @param event
+     */
+    public void postRegistration(FMLCommonSetupEvent event) {
+        //Register Capabilities
+        CapabilityManager.INSTANCE.register(ILeadPackCapability.class, new LeadCapStorage(), new DefaultLeadImplFactory());
+
+        //TODO Also change egg colour one day
+        //EntityRegistry.registerEgg(pupRL, 0, 1447446);
 
         //Add spawns
-        EntityRegistry.addSpawn(EntityEnderhoundPup.class, 100, 4, 4, EnumCreatureType.CREATURE, Biomes.BIRCH_FOREST,
-                Biomes.BIRCH_FOREST_HILLS, Biomes.COLD_TAIGA, Biomes.COLD_TAIGA_HILLS, Biomes.DESERT,
-                Biomes.DESERT_HILLS, Biomes.DESERT_HILLS, Biomes.EXTREME_HILLS, Biomes.EXTREME_HILLS_EDGE,
-                Biomes.EXTREME_HILLS_WITH_TREES, Biomes.FOREST_HILLS, Biomes.HELL, Biomes.ICE_MOUNTAINS,
-                Biomes.ICE_PLAINS, Biomes.MESA, Biomes.MESA_CLEAR_ROCK, Biomes.MESA_ROCK, Biomes.MUTATED_BIRCH_FOREST,
-                Biomes.MUTATED_BIRCH_FOREST_HILLS, Biomes.MUTATED_DESERT, Biomes.MUTATED_EXTREME_HILLS,
-                Biomes.MUTATED_EXTREME_HILLS_WITH_TREES, Biomes.MUTATED_FOREST, Biomes.MUTATED_ICE_FLATS,
-                Biomes.MUTATED_MESA, Biomes.MUTATED_MESA_CLEAR_ROCK, Biomes.MUTATED_MESA_ROCK, Biomes.MUTATED_PLAINS,
-                Biomes.MUTATED_REDWOOD_TAIGA, Biomes.MUTATED_REDWOOD_TAIGA_HILLS, Biomes.MUTATED_ROOFED_FOREST,
-                Biomes.MUTATED_SAVANNA, Biomes.MUTATED_SAVANNA_ROCK, Biomes.MUTATED_SWAMPLAND, Biomes.MUTATED_TAIGA,
-                Biomes.MUTATED_TAIGA_COLD, Biomes.PLAINS, Biomes.REDWOOD_TAIGA, Biomes.REDWOOD_TAIGA_HILLS,
-                Biomes.ROOFED_FOREST, Biomes.SAVANNA, Biomes.SAVANNA_PLATEAU, Biomes.STONE_BEACH, Biomes.SWAMPLAND,
-                Biomes.TAIGA, Biomes.TAIGA_HILLS, Biomes.VOID);
+        EntitySpawnPlacementRegistry.register(PUP_TYPE, EntitySpawnPlacementRegistry.SpawnPlacementType.ON_GROUND, Heightmap.Type.WORLD_SURFACE, null);
+
         //EntityRegistry.addSpawn(EntityEnderhoundPup.class, 4, 1, 3, EnumCreatureType.MONSTER);
         //EntityRegistry.addSpawn(EntityEnderhoundTeenage.class, 3, 1, 3, EnumCreatureType.MONSTER);
         //EntityRegistry.addSpawn(EntityEnderhoundMature.class, 2, 1, 3, EnumCreatureType.MONSTER);
         //EntityRegistry.addSpawn(EntityEnderhoundElderly.class, 1, 1, 3, EnumCreatureType.MONSTER);
-
-        proxy.registerModels();
-    }
-
-    @Mod.EventHandler
-    public void postInit(FMLPostInitializationEvent event)
-    {
     }
 
     ////////////////
@@ -163,13 +172,8 @@ public class EnderhoundsBase
                         ILeadPackCapability inst = LEADCAP.getDefaultInstance();
 
                         @Override
-                        public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
-                            return capability == LEADCAP;
-                        }
-
-                        @Override
-                        public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
-                            return capability == LEADCAP ? LEADCAP.<T>cast(inst) : null;
+                        public <T> LazyOptional<T> getCapability(Capability<T> capability, EnumFacing facing) {
+                            return capability == LEADCAP ? LazyOptional.of(() -> (T) inst) : LazyOptional.empty();
                         }
 
                         @Override
