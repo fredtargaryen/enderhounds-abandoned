@@ -15,5 +15,5 @@ public class DataReference {
     public static final double HERDRANGEMAXDIST = Math.sqrt(HERDRANGEXZ * HERDRANGEXZ + HERDRANGEY * HERDRANGEY);
     public static final double HERDRANGEFOLLOWDIST = HERDRANGEMAXDIST / 2;
 
-    public static final ResourceLocation LEAD_CAP_LOCATION = new ResourceLocation(DataReference.MODID, "ILeadPackCapability");
+    public static final ResourceLocation LEAD_CAP_LOCATION = new ResourceLocation(DataReference.MODID, "ileadpackcapability");
 }

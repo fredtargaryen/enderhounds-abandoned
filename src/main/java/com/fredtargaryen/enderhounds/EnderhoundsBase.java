@@ -77,7 +77,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.ObjectHolder;
 
 @Mod(value=DataReference.MODID)
-@ObjectHolder(DataReference.MODID)
+@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class EnderhoundsBase {
     //Declare EntityTypes here
     @ObjectHolder("pup")
