@@ -6,8 +6,8 @@ import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AbstractAttributeMap;
 import net.minecraft.world.World;
 
-public class EntityEnderhoundElderly extends EntityEnderhound {
-    public EntityEnderhoundElderly(EntityType type, World world) {
+public class ElderlyEnderhoundEntity extends EnderhoundEntity {
+    public ElderlyEnderhoundEntity(EntityType type, World world) {
         super(type, world);
         this.stage = GrowthStage.ELDERLY;
         switch(this.rand.nextInt(2)) {
@@ -30,7 +30,7 @@ public class EntityEnderhoundElderly extends EntityEnderhound {
         this.stepHeight = 2.5F;
     }
 
-    public EntityEnderhoundElderly(EntityEnderhoundMature adult) {
+    public ElderlyEnderhoundEntity(MatureEnderhoundEntity adult) {
         this(EnderhoundsBase.ELDERLY_TYPE, adult.world);
         this.power = adult.power;
         this.personality = adult.personality;
@@ -43,9 +43,9 @@ public class EntityEnderhoundElderly extends EntityEnderhound {
     @Override
     protected void registerAttributes() {
         super.registerAttributes();
-        AbstractAttributeMap aam = this.getAttributeMap();
+        AbstractAttributeMap aam = this.getAttributes();
         aam.getAttributeInstance(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(25);
-        aam.getAttributeInstance(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(8.0D);
+        aam.registerAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(8.0D);
     }
 
     protected void grow(){}

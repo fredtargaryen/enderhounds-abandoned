@@ -1,14 +1,13 @@
 package com.fredtargaryen.enderhounds.entity.ai;
 
-import com.fredtargaryen.enderhounds.entity.EntityEnderhound;
-import net.minecraft.entity.ai.EntityAIBase;
+import com.fredtargaryen.enderhounds.entity.EnderhoundEntity;
+import net.minecraft.entity.ai.goal.Goal;
 
-public class EntityAIPackLogic extends EntityAIBase {
-    private EntityEnderhound hound;
+public class PackLogicGoal extends Goal {
+    private EnderhoundEntity hound;
     private short ticksUntilRefreshLeader = 100;
 
-    public EntityAIPackLogic(EntityEnderhound hound)
-    {
+    public PackLogicGoal(EnderhoundEntity hound) {
         this.hound = hound;
     }
 

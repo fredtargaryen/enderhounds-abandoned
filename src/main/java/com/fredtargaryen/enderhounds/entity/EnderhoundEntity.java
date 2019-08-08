@@ -1,24 +1,21 @@
 package com.fredtargaryen.enderhounds.entity;
 
 import com.fredtargaryen.enderhounds.DataReference;
-import com.fredtargaryen.enderhounds.entity.ai.EntityAIPackLogic;
-import com.fredtargaryen.enderhounds.entity.ai.EntityAIFollowLeader;
-import com.google.common.base.Predicate;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.*;
+import com.fredtargaryen.enderhounds.entity.ai.FollowLeaderGoal;
+import com.fredtargaryen.enderhounds.entity.ai.PackLogicGoal;
+import net.minecraft.entity.*;
 import net.minecraft.entity.ai.attributes.AbstractAttributeMap;
-import net.minecraft.entity.monster.EntityEndermite;
-import net.minecraft.entity.monster.EntityMob;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Particles;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.*;
+import net.minecraft.entity.ai.goal.MeleeAttackGoal;
+import net.minecraft.entity.ai.goal.NearestAttackableTargetGoal;
+import net.minecraft.entity.ai.goal.RandomWalkingGoal;
+import net.minecraft.entity.monster.EndermiteEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.particles.ParticleTypes;
+import net.minecraft.util.DamageSource;
+import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
@@ -26,7 +23,7 @@ import java.util.Collections;
 
 import static com.fredtargaryen.enderhounds.EnderhoundsBase.LEADCAP;
 
-public abstract class EntityEnderhound extends EntityMob implements Comparable<EntityEnderhound> {
+public abstract class EnderhoundEntity extends CreatureEntity implements Comparable<EnderhoundEntity> {
     public enum GrowthStage {
         //TODO Correct eye heights and hitboxes
         PUP(0, 1.1F, 3, 0.5F, 1.0F),
@@ -87,41 +84,37 @@ public abstract class EntityEnderhound extends EntityMob implements Comparable<E
 
     public enum Power {
         NONE,
+        BALL,
         DOPPEL,
-        BALL
+        JAWS
     }
 
     public GrowthStage stage;
     public Personality personality;
     public Power power;
     protected boolean isShaking;
-    private ArrayList<EntityEnderhound> nearbyHounds = new ArrayList<EntityEnderhound>();
-    protected EntityLivingBase leader = null;
+    private ArrayList<EnderhoundEntity> nearbyHounds = new ArrayList<EnderhoundEntity>();
+    protected LivingEntity leader = null;
 
-    public EntityEnderhound(EntityType type, World world) {
+    public EnderhoundEntity(EntityType type, World world) {
         super(type, world);
-        this.setSize(this.stage.getBoxWidth(), this.stage.getBoxHeight());
+        //TODO this.setSize(this.stage.getBoxWidth(), this.stage.getBoxHeight());
         this.stepHeight = 1.0F;
-        this.tasks.addTask(0, new EntityAIAttackMelee(this, 1.0D, false));
-        this.tasks.addTask(1, new EntityAIFollowLeader(this));
-        this.tasks.addTask(2, new EntityAIWander(this, 1.0D));
-        this.tasks.addTask(3, new EntityAIPackLogic(this));
-        this.targetTasks.addTask(4, new EntityAINearestAttackableTarget(this, EntityEndermite.class, 10, true, false, new Predicate()
-        {
-            public boolean func_179948_a(EntityEndermite p_179948_1_)
-            {
-                return p_179948_1_.isSpawnedByPlayer();
-            }
-            public boolean apply(Object p_apply_1_)
-            {
-                return this.func_179948_a((EntityEndermite)p_apply_1_);
-            }
-        }));
+    }
+    
+    @Override
+    protected void registerGoals() {
+        super.registerGoals();
+        this.goalSelector.addGoal(0, new MeleeAttackGoal(this, 1.0D, false));
+        this.goalSelector.addGoal(1, new FollowLeaderGoal(this));
+        this.goalSelector.addGoal(2, new RandomWalkingGoal(this, 1.0D));
+        this.goalSelector.addGoal(3, new PackLogicGoal(this));
+        this.targetSelector.addGoal(4, new NearestAttackableTargetGoal<>(this, EndermiteEntity.class, true));
     }
 
     protected void registerAttributes() {
         super.registerAttributes();
-        AbstractAttributeMap aam = this.getAttributeMap();
+        AbstractAttributeMap aam = this.getAttributes();
         aam.getAttributeInstance(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.30000001192092896D);
         aam.getAttributeInstance(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(70.0D);
     }
@@ -131,7 +124,7 @@ public abstract class EntityEnderhound extends EntityMob implements Comparable<E
      * the super method, to prevent Enderhounds trying to interact with previous Enderhounds which don't exist anymore.
      */
     protected void grow() {
-        for(EntityEnderhound e : this.nearbyHounds) {
+        for(EnderhoundEntity e : this.nearbyHounds) {
             e.refreshNearbyHounds();
         }
     }
@@ -144,7 +137,7 @@ public abstract class EntityEnderhound extends EntityMob implements Comparable<E
         Collections.sort(this.nearbyHounds);
         //this.nearbyHounds will at least contain this
         //Strongest hound around is at bottom of list (could be this)
-        EntityEnderhound strongestHound = this.nearbyHounds.get(this.nearbyHounds.size() - 1);
+        EnderhoundEntity strongestHound = this.nearbyHounds.get(this.nearbyHounds.size() - 1);
         //Leader implicitly has ILeadPackCapability
         if(this.leader == null) {
             if(strongestHound != this) {
@@ -152,7 +145,7 @@ public abstract class EntityEnderhound extends EntityMob implements Comparable<E
             }
         }
         else {
-            this.leader.getCapability(LEADCAP, EnumFacing.UP).ifPresent(cap -> {
+            this.leader.getCapability(LEADCAP, Direction.UP).ifPresent(cap -> {
                 if (!cap.isStrongerThan(strongestHound)) {
                     if (strongestHound == this) {
                         this.leader = null;
@@ -169,7 +162,7 @@ public abstract class EntityEnderhound extends EntityMob implements Comparable<E
      * @param caller The Enderhound that called this method
      * @return Whether or not this Enderhound is following the caller
      */
-    public boolean isFollowingMe(EntityEnderhound caller)
+    public boolean isFollowingMe(EnderhoundEntity caller)
     {
         return caller == this.leader;
     }
@@ -180,14 +173,14 @@ public abstract class EntityEnderhound extends EntityMob implements Comparable<E
     private void refreshNearbyHounds()
     {
         this.nearbyHounds.clear();
-        for(Object o : this.world.getEntitiesWithinAABB(EntityEnderhound.class,
+        for(Object o : this.world.getEntitiesWithinAABB(EnderhoundEntity.class,
                 new AxisAlignedBB(this.posX - 0.5, this.posY - 0.5, this.posZ - 0.5,
                         this.posX + 0.5, this.posY + 0.5, this.posZ + 0.5)
                         .expand(DataReference.HERDRANGEXZ, DataReference.HERDRANGEY, DataReference.HERDRANGEXZ)))
         {
-            if(o instanceof EntityEnderhound)
+            if(o instanceof EnderhoundEntity)
             {
-                this.nearbyHounds.add((EntityEnderhound)o);
+                this.nearbyHounds.add((EnderhoundEntity)o);
             }
         }
     }
@@ -198,7 +191,7 @@ public abstract class EntityEnderhound extends EntityMob implements Comparable<E
      * @param ee2 The Enderhound to compare this Enderhound with
      * @return Whether this is naturally stronger than ee2
      */
-    public int compareTo(EntityEnderhound ee2)
+    public int compareTo(EnderhoundEntity ee2)
     {
         //Compares personality strengths
         int ee1points = this.personality.getStrengthLevel();
@@ -253,7 +246,14 @@ public abstract class EntityEnderhound extends EntityMob implements Comparable<E
     public void livingTick() {
         if (this.world.isRemote) {
             for (int i = 0; i < 2; ++i) {
-                this.world.spawnParticle(Particles.PORTAL, this.posX + (this.rand.nextDouble() - 0.5D) * (double)this.width, this.posY + this.rand.nextDouble() * (double)this.height - 0.25D, this.posZ + (this.rand.nextDouble() - 0.5D) * (double)this.width, (this.rand.nextDouble() - 0.5D) * 2.0D, -this.rand.nextDouble(), (this.rand.nextDouble() - 0.5D) * 2.0D);
+                this.world.addParticle(
+                        ParticleTypes.PORTAL,
+                        this.posX + (this.rand.nextDouble() - 0.5D) * (double)this.stage.getBoxWidth(),
+                        this.posY + this.rand.nextDouble() * (double)this.stage.getBoxHeight() - 0.25D,
+                        this.posZ + (this.rand.nextDouble() - 0.5D) * (double)this.stage.getBoxWidth(),
+                        (this.rand.nextDouble() - 0.5D) * 2.0D,
+                        -this.rand.nextDouble(),
+                        (this.rand.nextDouble() - 0.5D) * 2.0D);
             }
         }
 
@@ -273,13 +273,14 @@ public abstract class EntityEnderhound extends EntityMob implements Comparable<E
      * Applies the given player interaction to this Entity.
      */
     @Override
-    protected boolean processInteract(EntityPlayer player, EnumHand hand) {
+    protected boolean processInteract(PlayerEntity player, Hand hand) {
         this.setAttackTarget(this.getAttackTarget() == null ? player : null);
+        this.isShaking = !this.isShaking;
         return true;
     }
 
     @Override
-    public void read(NBTTagCompound nbt) {
+    public void read(CompoundNBT nbt) {
         super.read(nbt);
         switch(nbt.getInt("personality")) {
             case 0:
@@ -306,30 +307,30 @@ public abstract class EntityEnderhound extends EntityMob implements Comparable<E
     }
 
     @Override
-    public void writeAdditional(NBTTagCompound nbt) {
+    public void writeAdditional(CompoundNBT nbt) {
         super.writeAdditional(nbt);
         switch(this.personality) {
             case CUNNING:
-                nbt.setInt("personality", 0);
+                nbt.putInt("personality", 0);
                 break;
             case AGGRESSIVE:
-                nbt.setInt("personality", 1);
+                nbt.putInt("personality", 1);
                 break;
             //The "weak" personality
             default:
-                nbt.setInt("personality", 2);
+                nbt.putInt("personality", 2);
                 break;
         }
         switch(this.power) {
             case BALL:
-                nbt.setInt("power", 0);
+                nbt.putInt("power", 0);
                 break;
             case DOPPEL:
-                nbt.setInt("power", 1);
+                nbt.putInt("power", 1);
                 break;
             //No power
             default:
-                nbt.setInt("power", 2);
+                nbt.putInt("power", 2);
                 break;
         }
     }
@@ -343,26 +344,26 @@ public abstract class EntityEnderhound extends EntityMob implements Comparable<E
         angleTowardsPoint += this.rand.nextBoolean() ? Math.PI / 4 : -Math.PI / 4;
         angleTowardsPoint += this.rand.nextBoolean() ? Math.PI / 8 : -Math.PI / 8;
         int jumpDist = this.stage.getAverageTPLength();
-        this.attemptTeleport(x + jumpDist * Math.cos(angleTowardsPoint), y, z + jumpDist * Math.sin(angleTowardsPoint));
+        this.attemptTeleport(x + jumpDist * Math.cos(angleTowardsPoint), y, z + jumpDist * Math.sin(angleTowardsPoint), true);
     }
 
     public boolean attackEntityFrom(DamageSource source, float amount) {
         super.attackEntityFrom(source, amount);
         Entity e = source.getTrueSource();
-        if(e instanceof EntityLivingBase) {
-            this.setAttackTarget((EntityLivingBase) e);
-            this.pingNewAttackTarget((EntityLivingBase) e);
+        if(e instanceof LivingEntity) {
+            this.setAttackTarget((LivingEntity) e);
+            this.pingNewAttackTarget((LivingEntity) e);
         }
         return true;
     }
 
-    public void pingNewAttackTarget(EntityLivingBase targ) {
-        for(EntityEnderhound e : this.nearbyHounds) {
+    public void pingNewAttackTarget(LivingEntity targ) {
+        for(EnderhoundEntity e : this.nearbyHounds) {
             e.considerNewTarget(this, targ);
         }
     }
 
-    public void considerNewTarget(EntityEnderhound caller, EntityLivingBase targ) {
+    public void considerNewTarget(EnderhoundEntity caller, LivingEntity targ) {
         if(this.leader == null) {
             if(caller.isFollowingMe(this)) {
                 if (this.getAttackTarget() == null) {
@@ -385,11 +386,10 @@ public abstract class EntityEnderhound extends EntityMob implements Comparable<E
     //Simple getters
     public boolean isShaking() { return this.isShaking; }
 
-    public EntityLivingBase getLeader() { return this.leader; }
+    public LivingEntity getLeader() { return this.leader; }
 
-    public float getEyeHeight() {
-        return this.stage.getEyeHeight();
-    }
-
-    //TODO protected Item getDropItem(){return EnderhoundsBase.pelt;}
+    //TODO Remove
+//    public float getEyeHeight() {
+//        return this.stage.getEyeHeight();
+//    }
 }

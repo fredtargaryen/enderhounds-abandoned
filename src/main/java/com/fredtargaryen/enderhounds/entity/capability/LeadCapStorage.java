@@ -1,8 +1,8 @@
 package com.fredtargaryen.enderhounds.entity.capability;
 
-import net.minecraft.nbt.INBTBase;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.INBT;
+import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 
 /**
@@ -12,16 +12,16 @@ import net.minecraftforge.common.capabilities.Capability;
  */
 public class LeadCapStorage implements Capability.IStorage<ILeadPackCapability> {
     @Override
-    public INBTBase writeNBT(Capability<ILeadPackCapability> capability, ILeadPackCapability instance, EnumFacing side) {
-        //NBTTagCompound comp = new NBTTagCompound();
+    public INBT writeNBT(Capability<ILeadPackCapability> capability, ILeadPackCapability instance, Direction side) {
+        //CompoundNBT comp = new CompoundNBT();
         //comp.setDouble("pitch", instance.getRotPitch());
         //return comp;
-        return new NBTTagCompound();
+        return new CompoundNBT();
     }
 
     @Override
-    public void readNBT(Capability<ILeadPackCapability> capability, ILeadPackCapability instance, EnumFacing side, INBTBase nbt) {
-        //NBTTagCompound comp = (NBTTagCompound) nbt;
+    public void readNBT(Capability<ILeadPackCapability> capability, ILeadPackCapability instance, Direction side, INBT nbt) {
+        //CompoundNBT comp = (CompoundNBT) nbt;
         //instance.setRotPitch(comp.getDouble("pitch"));
     }
 }

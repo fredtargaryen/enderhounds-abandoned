@@ -1,3 +1,5 @@
 package com.fredtargaryen.enderhounds.proxy;
 
-public interface IProxy { }
+public interface IProxy {
+    void registerRenderers();
+}

@@ -3,12 +3,11 @@ package com.fredtargaryen.enderhounds;
 import net.minecraft.util.ResourceLocation;
 
 /**
- * When updating, change version number in here, mods.toml and build.gradle.
+ * When updating, change version number in mods.toml and build.gradle.
  */
 public class DataReference {
     public static final String MODNAME = "Enderhounds";
-    public static final String MODID = "enderhoundsft";
-    public static final String VERSION = "0.1.0";
+    public static final String MODID = "enderhounds";
 
     public static final double HERDRANGEXZ = 10;
     public static final double HERDRANGEY = 10;

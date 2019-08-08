@@ -1,9 +1,8 @@
 /**
  * TODO
- * Registering eggs
- *
+ * Pup model is a white cube (check)
  * Port Pup Techne model to Tabula
- * (EntityAIFollowLeader) Teleporting on uneven ground (check)
+ * (FollowLeaderGoal) Teleporting on uneven ground (check)
  * Fix hitboxes (check 1)
  * Fix eye heights (check 1)
  *
@@ -11,7 +10,7 @@
  * Regen (function of light level and y coord)
  * AI for getting hit
  * AI for ranged powers
- * Pelt
+ * Pelt (with loot table)
  * Armour
  * Humans and Endermen as leaders
  * Sound
@@ -42,7 +41,8 @@
  */
 package com.fredtargaryen.enderhounds;
 
-import com.fredtargaryen.enderhounds.entity.*;
+import com.fredtargaryen.enderhounds.entity.EnderhoundEntity;
+import com.fredtargaryen.enderhounds.entity.PupEnderhoundEntity;
 import com.fredtargaryen.enderhounds.entity.capability.DefaultLeadImplFactory;
 import com.fredtargaryen.enderhounds.entity.capability.ILeadPackCapability;
 import com.fredtargaryen.enderhounds.entity.capability.LeadCapStorage;
@@ -50,15 +50,16 @@ import com.fredtargaryen.enderhounds.proxy.ClientProxy;
 import com.fredtargaryen.enderhounds.proxy.IProxy;
 import com.fredtargaryen.enderhounds.proxy.ServerProxy;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntitySpawnPlacementRegistry;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.EnumCreatureType;
-import net.minecraft.entity.monster.EntityEnderman;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Biomes;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.entity.monster.EndermanEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
+import net.minecraft.item.SpawnEggItem;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.Direction;
 import net.minecraft.world.gen.Heightmap;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
@@ -69,19 +70,25 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.ObjectHolder;
 
-@Mod(value=DataReference.MODID)
+@Mod(value = DataReference.MODID)
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class EnderhoundsBase {
+    //Declare Items here
+    @ObjectHolder("pup_spawn_egg")
+    public static Item PUP_EGG;
+
     //Declare EntityTypes here
     @ObjectHolder("pup")
     public static EntityType PUP_TYPE;
+    private static EntityType PUP_EARLYREG;
     @ObjectHolder("teenage")
     public static EntityType TEENAGE_TYPE;
     @ObjectHolder("mature")
@@ -92,7 +99,7 @@ public class EnderhoundsBase {
     //Declare all items here
 
     // Says where the client and server 'proxy' code is loaded.
-    private static IProxy proxy = DistExecutor.runForDist(() -> () -> new ClientProxy(), () -> () -> new ServerProxy());
+    public static IProxy proxy = DistExecutor.runForDist(() -> () -> new ClientProxy(), () -> () -> new ServerProxy());
 
     public EnderhoundsBase() {
         //Register the config
@@ -102,6 +109,7 @@ public class EnderhoundsBase {
         IEventBus loadingBus = FMLJavaModLoadingContext.get().getModEventBus();
         // Register the setup method for modloading
         loadingBus.addListener(this::postRegistration);
+        loadingBus.addListener(this::clientSetup);
 
         // Register ourselves for server, registry and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
@@ -111,25 +119,40 @@ public class EnderhoundsBase {
     }
 
     @SubscribeEvent
+    public static void registerItems(RegistryEvent.Register<Item> event) {
+        PUP_EARLYREG = EntityType.Builder.create((type, world) -> new PupEnderhoundEntity(world), EntityClassification.MONSTER)
+                .size(EnderhoundEntity.GrowthStage.PUP.getBoxWidth(), EnderhoundEntity.GrowthStage.PUP.getBoxHeight())
+                .setTrackingRange(64)
+                .setUpdateInterval(10)
+                .setShouldReceiveVelocityUpdates(true)
+                .build(DataReference.MODID)
+                .setRegistryName("pup");
+        event.getRegistry().register(
+                new SpawnEggItem(PUP_EARLYREG, 0, 1447446, new Item.Properties().group(ItemGroup.MISC)).setRegistryName("pup_spawn_egg")
+        );
+    }
+
+    @SubscribeEvent
     public static void registerEntities(RegistryEvent.Register<EntityType<?>> event) {
         event.getRegistry().registerAll(
-                EntityType.Builder.create(EntityEnderhoundPup.class, EntityEnderhoundPup::new)
-                        .tracker(64, 10, true)
-                        .build(DataReference.MODID)
-                        .setRegistryName("pup")
-//                EntityType.Builder.create(EntityEnderhoundTeenage.class, EntityEnderhoundTeenage::new)
+                PUP_EARLYREG
+//                EntityType.Builder.create(TeenageEnderhoundEntity.class, TeenageEnderhoundEntity::new)
 //                        .tracker(64, 10, true)
 //                        .build(DataReference.MODID)
 //                        .setRegistryName("teenage"),
-//                EntityType.Builder.create(EntityEnderhoundMature.class, EntityEnderhoundMature::new)
+//                EntityType.Builder.create(MatureEnderhoundEntity.class, MatureEnderhoundEntity::new)
 //                        .tracker(64, 10, true)
 //                        .build(DataReference.MODID)
 //                        .setRegistryName("mature"),
-//                EntityType.Builder.create(EntityEnderhoundElderly.class, EntityEnderhoundElderly::new)
+//                EntityType.Builder.create(ElderlyEnderhoundEntity.class, ElderlyEnderhoundEntity::new)
 //                        .tracker(64, 10, true)
 //                        .build(DataReference.MODID)
 //                        .setRegistryName("elderly")
         );
+    }
+
+    public void clientSetup(FMLClientSetupEvent event) {
+        proxy.registerRenderers();
     }
 
     /**
@@ -140,16 +163,13 @@ public class EnderhoundsBase {
         //Register Capabilities
         CapabilityManager.INSTANCE.register(ILeadPackCapability.class, new LeadCapStorage(), new DefaultLeadImplFactory());
 
-        //TODO Also change egg colour one day
-        //EntityRegistry.registerEgg(pupRL, 0, 1447446);
-
         //Add spawns
-        EntitySpawnPlacementRegistry.register(PUP_TYPE, EntitySpawnPlacementRegistry.SpawnPlacementType.ON_GROUND, Heightmap.Type.WORLD_SURFACE, null);
+        EntitySpawnPlacementRegistry.register(PUP_TYPE, EntitySpawnPlacementRegistry.PlacementType.ON_GROUND, Heightmap.Type.WORLD_SURFACE, null);
 
-        //EntityRegistry.addSpawn(EntityEnderhoundPup.class, 4, 1, 3, EnumCreatureType.MONSTER);
-        //EntityRegistry.addSpawn(EntityEnderhoundTeenage.class, 3, 1, 3, EnumCreatureType.MONSTER);
-        //EntityRegistry.addSpawn(EntityEnderhoundMature.class, 2, 1, 3, EnumCreatureType.MONSTER);
-        //EntityRegistry.addSpawn(EntityEnderhoundElderly.class, 1, 1, 3, EnumCreatureType.MONSTER);
+        //EntityRegistry.addSpawn(PupEnderhoundEntity.class, 4, 1, 3, EnumCreatureType.MONSTER);
+        //EntityRegistry.addSpawn(TeenageEnderhoundEntity.class, 3, 1, 3, EnumCreatureType.MONSTER);
+        //EntityRegistry.addSpawn(MatureEnderhoundEntity.class, 2, 1, 3, EnumCreatureType.MONSTER);
+        //EntityRegistry.addSpawn(ElderlyEnderhoundEntity.class, 1, 1, 3, EnumCreatureType.MONSTER);
     }
 
     ////////////////
@@ -165,24 +185,24 @@ public class EnderhoundsBase {
     @SubscribeEvent
     public void addCapsToNewEntity(AttachCapabilitiesEvent<Entity> evt) {
         Entity e = evt.getObject();
-        if (e instanceof EntityPlayer || e instanceof EntityEnderhound || e instanceof EntityEnderman) {
+        if (e instanceof PlayerEntity || e instanceof EnderhoundEntity || e instanceof EndermanEntity) {
             evt.addCapability(DataReference.LEAD_CAP_LOCATION,
                     //Full name ICapabilitySerializableProvider
-                    new ICapabilitySerializable<NBTTagCompound>() {
+                    new ICapabilitySerializable<CompoundNBT>() {
                         ILeadPackCapability inst = LEADCAP.getDefaultInstance();
 
                         @Override
-                        public <T> LazyOptional<T> getCapability(Capability<T> capability, EnumFacing facing) {
+                        public <T> LazyOptional<T> getCapability(Capability<T> capability, Direction facing) {
                             return capability == LEADCAP ? LazyOptional.of(() -> (T) inst) : LazyOptional.empty();
                         }
 
                         @Override
-                        public NBTTagCompound serializeNBT() {
-                            return (NBTTagCompound) LEADCAP.getStorage().writeNBT(LEADCAP, inst, null);
+                        public CompoundNBT serializeNBT() {
+                            return (CompoundNBT) LEADCAP.getStorage().writeNBT(LEADCAP, inst, null);
                         }
 
                         @Override
-                        public void deserializeNBT(NBTTagCompound nbt) {
+                        public void deserializeNBT(CompoundNBT nbt) {
                             LEADCAP.getStorage().readNBT(LEADCAP, inst, null, nbt);
                         }
                     }

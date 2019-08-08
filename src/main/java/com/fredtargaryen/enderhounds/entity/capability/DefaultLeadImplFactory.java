@@ -1,6 +1,6 @@
 package com.fredtargaryen.enderhounds.entity.capability;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 
 import java.util.concurrent.Callable;
 
@@ -19,7 +19,7 @@ public class DefaultLeadImplFactory implements Callable<ILeadPackCapability> {
         public DefaultLeadImpl() {
         }
 
-        public boolean isStrongerThan(EntityLivingBase entity)
+        public boolean isStrongerThan(LivingEntity entity)
         {
             return entity.getHealth() < 10.0F;
         }

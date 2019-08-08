@@ -1,17 +1,17 @@
 package com.fredtargaryen.enderhounds.entity.ai;
 
 import com.fredtargaryen.enderhounds.DataReference;
-import com.fredtargaryen.enderhounds.entity.EntityEnderhound;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.ai.EntityAIBase;
+import com.fredtargaryen.enderhounds.entity.EnderhoundEntity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.goal.Goal;
 
-public class EntityAIFollowLeader extends EntityAIBase {
-    private EntityEnderhound follower;
-    private EntityLivingBase leader;
+public class FollowLeaderGoal extends Goal {
+    private EnderhoundEntity follower;
+    private LivingEntity leader;
 
     private double distanceFromLeader;
 
-    public EntityAIFollowLeader(EntityEnderhound follower)
+    public FollowLeaderGoal(EnderhoundEntity follower)
     {
         this.follower = follower;
     }
@@ -24,14 +24,14 @@ public class EntityAIFollowLeader extends EntityAIBase {
 
     @Override
     public boolean shouldContinueExecuting() {
-        this.distanceFromLeader = this.follower.getDistance(this.leader.posX, this.leader.posY, this.leader.posZ);
+        this.distanceFromLeader = this.follower.getDistance(this.leader);
         return this.leader.isAlive() && this.distanceFromLeader > DataReference.HERDRANGEFOLLOWDIST;
     }
 
     @Override
     public void tick() {
         if(this.distanceFromLeader > DataReference.HERDRANGEMAXDIST) {
-            this.follower.getLookHelper().setLookPosition(leader.posX, leader.posY + (double)leader.getEyeHeight(), leader.posZ, 10.0F, (float)follower.getVerticalFaceSpeed());
+            this.follower.getLookController().setLookPosition(leader.posX, leader.posY + (double)leader.getEyeHeight(), leader.posZ, 10.0F, (float)follower.getVerticalFaceSpeed());
             this.follower.singleTP(this.leader.posX, this.leader.posY, this.leader.posZ);
         }
         else {
