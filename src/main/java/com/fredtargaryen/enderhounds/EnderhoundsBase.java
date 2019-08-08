@@ -1,26 +1,19 @@
 /**
  * TODO
- * Pup model is a white cube (check)
  * Port Pup Techne model to Tabula
  * (FollowLeaderGoal) Teleporting on uneven ground (check)
  * Fix hitboxes (check 1)
  * Fix eye heights (check 1)
+ * Water damage
  *
  * Less particles when less healthy
  * Regen (function of light level and y coord)
  * AI for getting hit
  * AI for ranged powers
- * Pelt (with loot table)
- * Armour
+ * Pelt armour
  * Humans and Endermen as leaders
  * Sound
  * Banner
- *
- * Other notes:
- * Pup - drop 0-1 pelt
- * Teenager - drop 0-2 pelt
- * Mature - drop 1-4 pelt
- * Elderly - drop 3-5 pelt
  *
  * Aggressive:
  * -At >20% health, will take 3 hits before tp'ing
@@ -82,6 +75,8 @@ import net.minecraftforge.registries.ObjectHolder;
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class EnderhoundsBase {
     //Declare Items here
+    @ObjectHolder("pelt")
+    public static Item PELT;
     @ObjectHolder("pup_spawn_egg")
     public static Item PUP_EGG;
 
@@ -127,7 +122,8 @@ public class EnderhoundsBase {
                 .setShouldReceiveVelocityUpdates(true)
                 .build(DataReference.MODID)
                 .setRegistryName("pup");
-        event.getRegistry().register(
+        event.getRegistry().registerAll(
+                new Item(new Item.Properties().group(ItemGroup.MATERIALS)).setRegistryName("pelt"),
                 new SpawnEggItem(PUP_EARLYREG, 0, 1447446, new Item.Properties().group(ItemGroup.MISC)).setRegistryName("pup_spawn_egg")
         );
     }
