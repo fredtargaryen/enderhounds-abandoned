@@ -15,11 +15,13 @@
  * Sound
  * Banner
  *
+ * COMBAT LOGIC
  * Aggressive:
  * -At >20% health, will take 3 hits before tp'ing
  * -Stares and shakes very briefly before attacking
  * Cunning:
- * -On hit, teleports behind target
+ * -Tp's away after one or two hits
+ * -Can teleport behind target
  * -Stares and shakes a random amount of time before
  * attacking
  * -Occasionally pretends to give in at <50% health
@@ -27,10 +29,21 @@
  * -Teleports far away on hit
  * -Stares for a long time before attacking
  *
- * Powers:
- * * Ball
- * * Doppel
- * * Jaws
+ * PACK LOGIC
+ * Aggressive:
+ * -Will challenge at any health level but back down quickly
+ * -Will always fight and never surrender when challenged
+ * Cunning:
+ * -Will challenge when the leader's health is low
+ * -Will surrender at <20% health if challenged
+ * Weak:
+ * -Will never challenge
+ * -Will always surrender if challenged
+ *
+ * POWERS
+ * Ball: Long range straight line projectile
+ * Doppel: Create an identical copy of the Enderhound that moves in a different direction and dies in one hit
+ * Jaws: Pick up hostile mobs and place them near the target (these ones can bring food and items to leaders in peacetime)
  */
 package com.fredtargaryen.enderhounds;
 
