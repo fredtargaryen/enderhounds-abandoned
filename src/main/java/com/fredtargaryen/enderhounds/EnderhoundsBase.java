@@ -1,6 +1,5 @@
 /**
  * TODO
- * Port Pup Techne model to Tabula
  * (FollowLeaderGoal) Teleporting on uneven ground (check)
  * Fix hitboxes (check 1)
  * Fix eye heights (check 1)
