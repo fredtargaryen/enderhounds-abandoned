@@ -269,9 +269,17 @@ public abstract class EnderhoundEntity extends CreatureEntity implements Compara
 
     @Override
     protected void updateAITasks() {
-        if (this.isWet()) {
+        if (this.isInWaterRainOrBubbleColumn()) {
             this.attackEntityFrom(DamageSource.DROWN, 1.0F);
         }
+
+//        if (this.world.isDaytime() && this.ticksExisted >= this.targetChangeTime + 600) {
+//            float f = this.getBrightness();
+//            if (f > 0.5F && this.world.isSkyLightMax(new BlockPos(this)) && this.rand.nextFloat() * 30.0F < (f - 0.4F) * 2.0F) {
+//                this.setAttackTarget((LivingEntity)null);
+//                this.teleportRandomly();
+//            }
+//        }
         super.updateAITasks();
     }
 

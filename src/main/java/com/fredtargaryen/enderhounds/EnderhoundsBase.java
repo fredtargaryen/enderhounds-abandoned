@@ -1,12 +1,12 @@
 /**
  * TODO
  * Less particles when less healthy
+ * Regen (function of light level and y coord)
+ * Teenage Model
+ * Adult Model
+ * Elderly Model
  * Fix hitboxes (check 1)
  * Fix eye heights (check 1)
- * Water damage
- *
- * Less particles when less healthy
- * Regen (function of light level and y coord)
  * AI for getting hit
  * AI for ranged powers
  * Pelt armour
