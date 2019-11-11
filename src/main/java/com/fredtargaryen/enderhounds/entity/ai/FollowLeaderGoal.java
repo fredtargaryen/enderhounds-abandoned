@@ -32,7 +32,7 @@ public class FollowLeaderGoal extends Goal {
     public void tick() {
         if(this.distanceFromLeader > DataReference.HERDRANGEMAXDIST) {
             this.follower.getLookController().setLookPosition(leader.posX, leader.posY + (double)leader.getEyeHeight(), leader.posZ, 10.0F, (float)follower.getVerticalFaceSpeed());
-            this.follower.singleTP(this.leader.posX, this.leader.posY, this.leader.posZ);
+            this.follower.teleportOnceTowards(this.leader.posX, this.leader.posY, this.leader.posZ);
         }
         else {
             this.follower.getMoveHelper().setMoveTo(this.leader.posX, this.leader.posY, this.leader.posZ, this.follower.getAIMoveSpeed());

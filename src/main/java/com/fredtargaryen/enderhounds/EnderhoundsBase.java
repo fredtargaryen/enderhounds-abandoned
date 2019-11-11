@@ -1,6 +1,6 @@
 /**
  * TODO
- * (FollowLeaderGoal) Teleporting on uneven ground (check)
+ * Less particles when less healthy
  * Fix hitboxes (check 1)
  * Fix eye heights (check 1)
  * Water damage

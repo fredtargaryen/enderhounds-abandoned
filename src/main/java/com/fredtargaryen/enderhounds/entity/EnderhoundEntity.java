@@ -15,7 +15,10 @@ import net.minecraft.particles.ParticleTypes;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
@@ -26,10 +29,10 @@ import static com.fredtargaryen.enderhounds.EnderhoundsBase.LEADCAP;
 public abstract class EnderhoundEntity extends CreatureEntity implements Comparable<EnderhoundEntity> {
     public enum GrowthStage {
         //TODO Correct eye heights and hitboxes
-        PUP(0, 1.1F, 3, 0.5F, 1.0F),
-        TEENAGE(1, 0.0F, 5, 0.5F, 1.0F),
-        MATURE(3, 0.0F, 9, 0.5F, 1.0F),
-        ELDERLY(2, 0.0F, 7, 0.5F, 1.0F);
+        PUP(0, 1.1F, 3, 0.5F, 1.0F, 8),
+        TEENAGE(1, 0.0F, 5, 0.5F, 1.0F, 16),
+        MATURE(3, 0.0F, 9, 0.5F, 1.0F, 32),
+        ELDERLY(2, 0.0F, 7, 0.5F, 1.0F, 24);
 
         /**
          * Shows which growth stage is strongest, for Enderhound strength comparison.
@@ -40,13 +43,15 @@ public abstract class EnderhoundEntity extends CreatureEntity implements Compara
         private final int averageTPLength;
         private final float bBoxWidth;
         private final float bBoxHeight;
+        private final int tpRange;
 
-        GrowthStage(int strengthLevel, float eyeHeight, int averTPLen, float width, float height) {
+        GrowthStage(int strengthLevel, float eyeHeight, int averTPLen, float width, float height, int tpRange) {
             this.strengthLevel = strengthLevel;
             this.eyeHeight = eyeHeight;
             this.averageTPLength = averTPLen;
             this.bBoxWidth = width;
             this.bBoxHeight = height;
+            this.tpRange = tpRange;
         }
 
         //Getters below here
@@ -55,6 +60,7 @@ public abstract class EnderhoundEntity extends CreatureEntity implements Compara
         public int getAverageTPLength() { return averageTPLength; }
         public float getBoxWidth() { return bBoxWidth; }
         public float getBoxHeight() { return bBoxHeight; }
+        public int getTpRange() { return tpRange; }
     }
 
     public enum Personality {
@@ -335,17 +341,72 @@ public abstract class EnderhoundEntity extends CreatureEntity implements Compara
         }
     }
 
+    ///////////////////////////////////////////
+    //TELEPORT METHODS - STOLEN FROM ENDERMAN//
+    ///////////////////////////////////////////
+    /**
+     * Teleport the enderhound to a random nearby position within its range
+     */
+    protected boolean teleportRandomly() {
+        int range = this.stage.getTpRange();
+        double d0 = this.posX + (this.rand.nextDouble() - 0.5D) * range;
+        double d1 = this.posY + (double)(this.rand.nextInt(range) - (range / 2));
+        double d2 = this.posZ + (this.rand.nextDouble() - 0.5D) * range;
+        return this.teleportTo(d0, d1, d2);
+    }
+
+    /**
+     * Teleport the enderhound to another entity. Probably will never use
+     */
+    protected boolean teleportToEntity(Entity p_70816_1_) {
+        Vec3d vec3d = new Vec3d(this.posX - p_70816_1_.posX, this.getBoundingBox().minY + (double)(this.getHeight() / 2.0F) - p_70816_1_.posY + (double)p_70816_1_.getEyeHeight(), this.posZ - p_70816_1_.posZ);
+        vec3d = vec3d.normalize();
+        double d0 = 16.0D;
+        double d1 = this.posX + (this.rand.nextDouble() - 0.5D) * 8.0D - vec3d.x * 16.0D;
+        double d2 = this.posY + (double)(this.rand.nextInt(16) - 8) - vec3d.y * 16.0D;
+        double d3 = this.posZ + (this.rand.nextDouble() - 0.5D) * 8.0D - vec3d.z * 16.0D;
+        return this.teleportTo(d1, d2, d3);
+    }
+
+    /**
+     * Teleport the enderhound
+     */
+    protected boolean teleportTo(double x, double y, double z) {
+        BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos(x, y, z);
+
+        while(blockpos$mutableblockpos.getY() > 0 && !this.world.getBlockState(blockpos$mutableblockpos).getMaterial().blocksMovement()) {
+            blockpos$mutableblockpos.move(Direction.DOWN);
+        }
+
+        if (!this.world.getBlockState(blockpos$mutableblockpos).getMaterial().blocksMovement()) {
+            return false;
+        } else {
+            net.minecraftforge.event.entity.living.EnderTeleportEvent event = new net.minecraftforge.event.entity.living.EnderTeleportEvent(this, x, y, z, 0);
+            if (net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(event)) return false;
+            boolean flag = this.attemptTeleport(event.getTargetX(), event.getTargetY(), event.getTargetZ(), true);
+            if (flag) {
+                this.world.playSound((PlayerEntity)null, this.prevPosX, this.prevPosY, this.prevPosZ, SoundEvents.ENTITY_ENDERMAN_TELEPORT, this.getSoundCategory(), 1.0F, 1.0F);
+                this.playSound(SoundEvents.ENTITY_ENDERMAN_TELEPORT, 1.0F, 1.0F);
+            }
+
+            return flag;
+        }
+    }
+
     /**
      * x, y and z are of the ultimate target. This will do a single TP roughly towards it, covering roughly the jump
      * length of the Enderhound.
      */
-    public void singleTP(double x, double y, double z) {
+    public void teleportOnceTowards(double x, double y, double z) {
         double angleTowardsPoint = Math.atan2(z - this.posZ, x - this.posX);
         angleTowardsPoint += this.rand.nextBoolean() ? Math.PI / 4 : -Math.PI / 4;
         angleTowardsPoint += this.rand.nextBoolean() ? Math.PI / 8 : -Math.PI / 8;
-        int jumpDist = this.stage.getAverageTPLength();
-        this.attemptTeleport(x + jumpDist * Math.cos(angleTowardsPoint), y, z + jumpDist * Math.sin(angleTowardsPoint), true);
+        int range = this.stage.getTpRange();
+        this.teleportTo(x + range * Math.cos(angleTowardsPoint), y, z + range * Math.sin(angleTowardsPoint));
     }
+    ///////////////////////////
+    //END OF TELEPORT METHODS//
+    ///////////////////////////
 
     public boolean attackEntityFrom(DamageSource source, float amount) {
         super.attackEntityFrom(source, amount);
