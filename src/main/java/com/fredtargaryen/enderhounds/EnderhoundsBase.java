@@ -1,6 +1,5 @@
 /**
  * TODO
- * Regen (function of light level and y coord)
  * Teenage Model
  * Adult Model
  * Elderly Model

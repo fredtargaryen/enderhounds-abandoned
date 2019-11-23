@@ -250,8 +250,10 @@ public abstract class EnderhoundEntity extends CreatureEntity implements Compara
      */
     @Override
     public void livingTick() {
+        float health = this.getHealth();
+        float maxHealth = this.getMaxHealth();
         if (this.world.isRemote) {
-            float healthRatio = this.getHealth() / this.getMaxHealth();
+            float healthRatio = health / maxHealth;
             //If at less than 1/3 health, doesn't spawn any particles
             //Else if at less than 2/3 health, spawns one particle
             //Else spawns 2 particles
@@ -264,6 +266,21 @@ public abstract class EnderhoundEntity extends CreatureEntity implements Compara
                         (this.rand.nextDouble() - 0.5D) * 2.0D,
                         -this.rand.nextDouble(),
                         (this.rand.nextDouble() - 0.5D) * 2.0D);
+            }
+        }
+        else
+        {
+            BlockPos pos = this.getPosition();
+            float lightLevel = this.world.getLight(pos);
+            float yCoord = pos.getY();
+            //Should it heal?
+            if(lightLevel <= 10 && yCoord < 129 && health < maxHealth)
+            {
+                int ticksUntilRegen = (int) ((lightLevel + 1) * 10 + yCoord);
+                if(this.ticksExisted % ticksUntilRegen == 0)
+                {
+                    this.heal(1F);
+                }
             }
         }
 
