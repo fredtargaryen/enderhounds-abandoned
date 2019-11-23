@@ -251,7 +251,11 @@ public abstract class EnderhoundEntity extends CreatureEntity implements Compara
     @Override
     public void livingTick() {
         if (this.world.isRemote) {
-            for (int i = 0; i < 2; ++i) {
+            float healthRatio = this.getHealth() / this.getMaxHealth();
+            //If at less than 1/3 health, doesn't spawn any particles
+            //Else if at less than 2/3 health, spawns one particle
+            //Else spawns 2 particles
+            for (int i = 0; i < healthRatio * 3 - 1; ++i) {
                 this.world.addParticle(
                         ParticleTypes.PORTAL,
                         this.posX + (this.rand.nextDouble() - 0.5D) * (double)this.stage.getBoxWidth(),

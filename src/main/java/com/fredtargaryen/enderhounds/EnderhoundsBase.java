@@ -1,6 +1,5 @@
 /**
  * TODO
- * Less particles when less healthy
  * Regen (function of light level and y coord)
  * Teenage Model
  * Adult Model
