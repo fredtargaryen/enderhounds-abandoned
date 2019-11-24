@@ -89,11 +89,13 @@ public class PupEnderhoundModel extends EntityModel<PupEnderhoundEntity> {
         Head = new RendererModel(this, 18, 15);
         Head.addBox(-2.5F, -4F, -4F, 5, 4, 4);
         Head.setTextureSize(64, 32);
+        Head.setRotationPoint(0F, 9.7F, -5F);
         setRotation(Head, 0F, 0F, 0F);
 
         Body1 = new RendererModel(this, 0, 0);
         Body1.addBox(-3F, -3F, -2F, 6, 6, 4);
         Body1.setTextureSize(64, 32);
+        Body1.setRotationPoint(0F, 11.7F, -4F);
         setRotation(Body1, 0F, 0F, 0F);
 
         Body2 = new RendererModel(this, 20, 0);
@@ -103,6 +105,7 @@ public class PupEnderhoundModel extends EntityModel<PupEnderhoundEntity> {
         Body3 = new RendererModel(this, 40, 0);
         Body3.addBox(-3F, -3F, -2F, 6, 6, 4);
         Body3.setTextureSize(64, 32);
+        Body3.setRotationPoint(0F, 11.7F, 4F);
         setRotation(Body3, 0F, 0F, 0F);
 
         Ear_L = new RendererModel(this, 58, 10);
@@ -112,21 +115,25 @@ public class PupEnderhoundModel extends EntityModel<PupEnderhoundEntity> {
         Leg_L_F = new RendererModel(this, 56, 19);
         Leg_L_F.addBox(-1F, 0F, -1F, 2, 10, 2);
         Leg_L_F.setTextureSize(64, 32);
+        Leg_L_F.setRotationPoint(1.9F, 14F, -4.9F);
         setRotation(Leg_L_F, 0F, 0F, 0F);
 
         Leg_R_F = new RendererModel(this, 56, 19);
         Leg_R_F.addBox(-1F, 0F, -1F, 2, 10, 2);
         Leg_R_F.setTextureSize(64, 32);
+        Leg_R_F.setRotationPoint(-1.9F, 14F, -4.9F);
         setRotation(Leg_R_F, 0F, 0F, 0F);
 
         Leg_L_B = new RendererModel(this, 56, 19);
         Leg_L_B.addBox(-1F, 0F, -1F, 2, 10, 2);
         Leg_L_B.setTextureSize(64, 32);
+        Leg_L_B.setRotationPoint(1.9F, 14F, 4.9F);
         setRotation(Leg_L_B, 0F, 0F, 0F);
 
         Leg_R_B = new RendererModel(this, 56, 19);
         Leg_R_B.addBox(-1F, 0F, -1F, 2, 10, 2);
         Leg_R_B.setTextureSize(64, 32);
+        Leg_R_B.setRotationPoint(-1.9F, 14F, 4.9F);
         setRotation(Leg_R_B, 0F, 0F, 0F);
 
         Tail = new RendererModel(this, 45, 20);
@@ -156,6 +163,7 @@ public class PupEnderhoundModel extends EntityModel<PupEnderhoundEntity> {
         Jaw = new RendererModel(this, 0, 22);
         Jaw.addBox(-2.5F, -0.5F, -4F, 5, 1, 4);
         Jaw.setTextureSize(64, 32);
+        Jaw.setRotationPoint(0F, 9.2F, -9F);
         setRotation(Jaw, 0F, 0F, 0F);
 
         Jaw_Membrane = new RendererModel(this, 34, 28);
