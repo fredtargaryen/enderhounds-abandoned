@@ -54,31 +54,10 @@ public class PupEnderhoundModel extends EntityModel<PupEnderhoundEntity> {
             new float[] {1.5707963F, 0F, 0F}
     );
 
-    public static RendererModelTransform Tooth_T_RMT = new RendererModelTransform(
-            new float[] {0F, 8.7F, -12F},
-            new float[] {0F, 0F, 0F},
-            new float[] {0F, 8.7F, -13F},
-            new float[] {0F, 0F, 0F}
-    );
-
-    public static RendererModelTransform Tooth_B_RMT = new RendererModelTransform(
-            new float[] {0F, 9.7F, -12F},
-            new float[] {0F, 0F, 0F},
-            new float[] {0F, 12.7F, -13F},
-            new float[] {0F, 0F, 0F}
-    );
-
     public static RendererModelTransform Jaw_RMT = new RendererModelTransform(
             new float[] {0F, 9.2F, -9F},
             new float[] {0F, 0F, 0F},
             new float[] {0F, 13.2F, -9F},
-            new float[] {0F, 0F, 0F}
-    );
-
-    public static RendererModelTransform Jaw_Membrane_RMT = new RendererModelTransform(
-            new float[] {0F, 11.7F, -4F},
-            new float[] {0F, 0F, 0F},
-            new float[] {0F, 10.7F, -9F},
             new float[] {0F, 0F, 0F}
     );
 
@@ -153,11 +132,13 @@ public class PupEnderhoundModel extends EntityModel<PupEnderhoundEntity> {
         Tooth_T = new RendererModel(this, 62, 31);
         Tooth_T.addBox(-0.5F, 0F, 0F, 1, 1, 0);
         Tooth_T.setTextureSize(64, 32);
+        Tooth_T.setRotationPoint(0F, 8.7F, -13F);
         setRotation(Tooth_T, 0F, 0F, 0F);
 
         Tooth_B = new RendererModel(this, 62, 31);
         Tooth_B.addBox(-0.5F, -1F, 0F, 1, 1, 0);
         Tooth_B.setTextureSize(64, 32);
+        Tooth_B.setRotationPoint(0F, 12.7F, -13F);
         setRotation(Tooth_B, 0F, 0F, 0F);
 
         Jaw = new RendererModel(this, 0, 22);
@@ -169,6 +150,7 @@ public class PupEnderhoundModel extends EntityModel<PupEnderhoundEntity> {
         Jaw_Membrane = new RendererModel(this, 34, 28);
         Jaw_Membrane.addBox(-2.5F, -2F, 0F, 5, 4, 0);
         Jaw_Membrane.setTextureSize(64, 32);
+        Jaw_Membrane.setRotationPoint(0F, 10.7F, -9F);
         setRotation(Jaw_Membrane, 0F, 0F, 0F);
     }
 
@@ -181,10 +163,7 @@ public class PupEnderhoundModel extends EntityModel<PupEnderhoundEntity> {
             RendererModelTransform.setCalmTransform(Ear_L, Ear_L_RMT);
             RendererModelTransform.setCalmTransform(Ear_R, Ear_R_RMT);
             RendererModelTransform.setCalmTransform(Tail, Tail_RMT);
-            RendererModelTransform.setCalmTransform(Tooth_T, Tooth_T_RMT);
-            RendererModelTransform.setCalmTransform(Tooth_B, Tooth_B_RMT);
             RendererModelTransform.setCalmTransform(Jaw, Jaw_RMT);
-            RendererModelTransform.setCalmTransform(Jaw_Membrane, Jaw_Membrane_RMT);
         }
         else {
             //Arch the back, like a cat
@@ -195,11 +174,11 @@ public class PupEnderhoundModel extends EntityModel<PupEnderhoundEntity> {
             //Straighten tail
             RendererModelTransform.setAngryTransform(Tail, Tail_RMT);
             //Show teeth
-            RendererModelTransform.setAngryTransform(Tooth_T, Tooth_T_RMT);
-            RendererModelTransform.setAngryTransform(Tooth_B, Tooth_B_RMT);
+            Tooth_T.render(scale);
+            Tooth_B.render(scale);
             //Open up jaws
             RendererModelTransform.setAngryTransform(Jaw, Jaw_RMT);
-            RendererModelTransform.setAngryTransform(Jaw_Membrane, Jaw_Membrane_RMT);
+            Jaw_Membrane.render(scale);
         }
         Body1.render(scale);
         Head.render(scale);
@@ -213,10 +192,7 @@ public class PupEnderhoundModel extends EntityModel<PupEnderhoundEntity> {
         Tail.render(scale);
         Snout.render(scale);
         Ear_R.render(scale);
-        Tooth_T.render(scale);
-        Tooth_B.render(scale);
         Jaw.render(scale);
-        Jaw_Membrane.render(scale);
     }
 
     /**
