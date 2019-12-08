@@ -1,6 +1,5 @@
 /**
  * TODO
- * Teenage Model
  * Adult Model
  * Elderly Model
  * Fix hitboxes (check 1)
