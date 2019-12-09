@@ -45,6 +45,7 @@ package com.fredtargaryen.enderhounds;
 
 import com.fredtargaryen.enderhounds.entity.EnderhoundEntity;
 import com.fredtargaryen.enderhounds.entity.PupEnderhoundEntity;
+import com.fredtargaryen.enderhounds.entity.TeenageEnderhoundEntity;
 import com.fredtargaryen.enderhounds.entity.capability.DefaultLeadImplFactory;
 import com.fredtargaryen.enderhounds.entity.capability.ILeadPackCapability;
 import com.fredtargaryen.enderhounds.entity.capability.LeadCapStorage;
@@ -140,11 +141,14 @@ public class EnderhoundsBase {
     @SubscribeEvent
     public static void registerEntities(RegistryEvent.Register<EntityType<?>> event) {
         event.getRegistry().registerAll(
-                PUP_EARLYREG
-//                EntityType.Builder.create(TeenageEnderhoundEntity.class, TeenageEnderhoundEntity::new)
-//                        .tracker(64, 10, true)
-//                        .build(DataReference.MODID)
-//                        .setRegistryName("teenage"),
+                PUP_EARLYREG,
+                EntityType.Builder.create((type, world) -> new TeenageEnderhoundEntity(world), EntityClassification.MONSTER)
+                        .size(EnderhoundEntity.GrowthStage.TEENAGE.getBoxWidth(), EnderhoundEntity.GrowthStage.TEENAGE.getBoxHeight())
+                        .setTrackingRange(64)
+                        .setUpdateInterval(10)
+                        .setShouldReceiveVelocityUpdates(true)
+                        .build(DataReference.MODID)
+                        .setRegistryName("teenage")
 //                EntityType.Builder.create(MatureEnderhoundEntity.class, MatureEnderhoundEntity::new)
 //                        .tracker(64, 10, true)
 //                        .build(DataReference.MODID)
@@ -172,9 +176,6 @@ public class EnderhoundsBase {
         EntitySpawnPlacementRegistry.register(PUP_TYPE, EntitySpawnPlacementRegistry.PlacementType.ON_GROUND, Heightmap.Type.WORLD_SURFACE, null);
 
         //EntityRegistry.addSpawn(PupEnderhoundEntity.class, 4, 1, 3, EnumCreatureType.MONSTER);
-        //EntityRegistry.addSpawn(TeenageEnderhoundEntity.class, 3, 1, 3, EnumCreatureType.MONSTER);
-        //EntityRegistry.addSpawn(MatureEnderhoundEntity.class, 2, 1, 3, EnumCreatureType.MONSTER);
-        //EntityRegistry.addSpawn(ElderlyEnderhoundEntity.class, 1, 1, 3, EnumCreatureType.MONSTER);
     }
 
     ////////////////

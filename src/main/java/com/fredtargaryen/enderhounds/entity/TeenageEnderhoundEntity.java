@@ -7,8 +7,8 @@ import net.minecraft.entity.ai.attributes.AbstractAttributeMap;
 import net.minecraft.world.World;
 
 public class TeenageEnderhoundEntity extends EnderhoundEntity {
-    public TeenageEnderhoundEntity(EntityType type, World world) {
-        super(type, world);
+    public TeenageEnderhoundEntity(World world) {
+        super(EnderhoundsBase.TEENAGE_TYPE, world);
         this.stage = GrowthStage.TEENAGE;
         switch(this.rand.nextInt(3)) {
             case 2:
@@ -34,7 +34,7 @@ public class TeenageEnderhoundEntity extends EnderhoundEntity {
     }
 
     public TeenageEnderhoundEntity(PupEnderhoundEntity pup) {
-        this(EnderhoundsBase.TEENAGE_TYPE, pup.world);
+        this(pup.world);
         this.setHealth(this.getMaxHealth() * pup.getHealth() / pup.getMaxHealth());
         this.leader = pup.leader;
     }
