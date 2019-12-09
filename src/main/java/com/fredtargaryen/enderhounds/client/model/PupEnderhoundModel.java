@@ -4,6 +4,8 @@ import com.fredtargaryen.enderhounds.entity.PupEnderhoundEntity;
 import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.client.renderer.entity.model.RendererModel;
 
+import java.util.HashMap;
+
 /**
  * PupEnderhoundModel - FredTargaryen
  * Created using Tabula 7.0.1
@@ -26,40 +28,8 @@ public class PupEnderhoundModel extends EntityModel<PupEnderhoundEntity> {
     public RendererModel Jaw;
     public RendererModel Jaw_Membrane;
 
-    public static RendererModelTransform Body2_RMT = new RendererModelTransform(
-            new float[] {0F, 11.7F, 0F},
-            new float[] {0F, 0F, 0F},
-            new float[] {0F, 8.7F, 0F},
-            new float[] {0F, 0F, 0F}
-    );
-
-    public static RendererModelTransform Ear_L_RMT = new RendererModelTransform(
-            new float[] {2.5F, 6.7F, -5F},
-            new float[] {0F, 0.7853982F, 0F},
-            new float[] {2.5F, 7.7F, -5F},
-            new float[] {-0.83775804F, 0.34906585F, 0F}
-    );
-
-    public static RendererModelTransform Ear_R_RMT = new RendererModelTransform(
-            new float[] {-2.5F, 6.7F, -5F},
-            new float[] {0F, -0.7853982F, 0F},
-            new float[] {-2.5F, 7.7F, -5F},
-            new float[] {-0.83775804F, -0.34906585F, 0F}
-    );
-
-    public static RendererModelTransform Tail_RMT = new RendererModelTransform(
-            new float[] {0F, 10.2F, 5F},
-            new float[] {0.7853982F, 0F, 0F},
-            new float[] {0F, 10.2F, 5F},
-            new float[] {1.5707963F, 0F, 0F}
-    );
-
-    public static RendererModelTransform Jaw_RMT = new RendererModelTransform(
-            new float[] {0F, 9.2F, -9F},
-            new float[] {0F, 0F, 0F},
-            new float[] {0F, 13.2F, -9F},
-            new float[] {0F, 0F, 0F}
-    );
+    private HashMap<RendererModel, RendererModelTransform> calmTransforms;
+    private HashMap<RendererModel, RendererModelTransform> angryTransforms;
 
     public PupEnderhoundModel() {
         textureWidth = 64;
@@ -152,6 +122,20 @@ public class PupEnderhoundModel extends EntityModel<PupEnderhoundEntity> {
         Jaw_Membrane.setTextureSize(64, 32);
         Jaw_Membrane.setRotationPoint(0F, 10.7F, -9F);
         setRotation(Jaw_Membrane, 0F, 0F, 0F);
+
+        //Set calm and angry transforms
+        this.calmTransforms = new HashMap<>();
+        this.angryTransforms = new HashMap<>();
+        this.calmTransforms.put(Body2, new RendererModelTransform(0f, 11.7f, 0f, 0f, 0f, 0f));
+        this.angryTransforms.put(Body2, new RendererModelTransform(0f, 8.7f, 0f, 0f, 0f, 0f));
+        this.calmTransforms.put(Ear_L, new RendererModelTransform(2.5f, 6.7f, -5f, 0f, 0.7853982f, 0f));
+        this.angryTransforms.put(Ear_L, new RendererModelTransform(2.5f, 7.7f, -5f, -0.83775804f, 0.34906585f, 0f));
+        this.calmTransforms.put(Ear_R, new RendererModelTransform(-2.5f, 6.7f, -5f, 0f, -0.7853982f, 0f));
+        this.angryTransforms.put(Ear_R, new RendererModelTransform(-2.5f, 7.7f, -5f, -0.83775804f, -0.34906585f, 0f));
+        this.calmTransforms.put(Tail, new RendererModelTransform(0f, 10.2f, 5f, 0.7853982f, 0f, 0f));
+        this.angryTransforms.put(Tail, new RendererModelTransform(0f, 10.2f, 5f, 1.5707963f, 0f, 0f));
+        this.calmTransforms.put(Jaw, new RendererModelTransform(0f, 9.2f, -9f, 0f, 0f, 0f));
+        this.angryTransforms.put(Jaw, new RendererModelTransform(0f, 13.2f, -9f, 0f, 0f, 0f));
     }
 
     @Override
@@ -159,25 +143,17 @@ public class PupEnderhoundModel extends EntityModel<PupEnderhoundEntity> {
         super.render(pup, limbSwingTime, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
         this.setRotationAngles(pup, limbSwingTime, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
         if(pup.getAttackTarget() == null) {
-            RendererModelTransform.setCalmTransform(Body2, Body2_RMT);
-            RendererModelTransform.setCalmTransform(Ear_L, Ear_L_RMT);
-            RendererModelTransform.setCalmTransform(Ear_R, Ear_R_RMT);
-            RendererModelTransform.setCalmTransform(Tail, Tail_RMT);
-            RendererModelTransform.setCalmTransform(Jaw, Jaw_RMT);
+            RendererModelTransform.applyTransformsInHashMap(this.calmTransforms);
         }
         else {
             //Arch the back, like a cat
-            RendererModelTransform.setAngryTransform(Body2, Body2_RMT);
             //Fold back ears
-            RendererModelTransform.setAngryTransform(Ear_L, Ear_L_RMT);
-            RendererModelTransform.setAngryTransform(Ear_R, Ear_R_RMT);
             //Straighten tail
-            RendererModelTransform.setAngryTransform(Tail, Tail_RMT);
+            RendererModelTransform.applyTransformsInHashMap(this.angryTransforms);
             //Show teeth
             Tooth_T.render(scale);
             Tooth_B.render(scale);
             //Open up jaws
-            RendererModelTransform.setAngryTransform(Jaw, Jaw_RMT);
             Jaw_Membrane.render(scale);
         }
         Body1.render(scale);
