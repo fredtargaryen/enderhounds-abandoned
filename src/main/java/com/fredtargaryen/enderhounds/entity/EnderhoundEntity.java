@@ -2,7 +2,8 @@ package com.fredtargaryen.enderhounds.entity;
 
 import com.fredtargaryen.enderhounds.DataReference;
 import com.fredtargaryen.enderhounds.entity.ai.FollowLeaderGoal;
-import com.fredtargaryen.enderhounds.entity.ai.PackLogicGoal;
+import com.fredtargaryen.enderhounds.entity.ai.PeacetimeLogicGoal;
+import com.fredtargaryen.enderhounds.entity.ai.TemporaryEscapeGoal;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.attributes.AbstractAttributeMap;
 import net.minecraft.entity.ai.goal.MeleeAttackGoal;
@@ -29,10 +30,10 @@ import static com.fredtargaryen.enderhounds.EnderhoundsBase.LEADCAP;
 public abstract class EnderhoundEntity extends CreatureEntity implements Comparable<EnderhoundEntity> {
     public enum GrowthStage {
         //TODO Correct eye heights and hitboxes
-        PUP(0, 1.1F, 3, 0.5F, 1.0F, 8),
-        TEENAGE(1, 0.0F, 5, 0.5F, 1.0F, 16),
-        MATURE(3, 0.0F, 9, 0.5F, 1.0F, 32),
-        ELDERLY(2, 0.0F, 7, 0.5F, 1.0F, 24);
+        PUP(0, 1.1F, 3, 0.5F, 1.0F, 8, 12),
+        TEENAGE(1, 0.0F, 5, 0.5F, 1.0F, 16, 8),
+        MATURE(3, 0.0F, 9, 0.5F, 1.0F, 32, 4),
+        ELDERLY(2, 0.0F, 7, 0.5F, 1.0F, 24, 8);
 
         /**
          * Shows which growth stage is strongest, for Enderhound strength comparison.
@@ -44,14 +45,17 @@ public abstract class EnderhoundEntity extends CreatureEntity implements Compara
         private final float bBoxWidth;
         private final float bBoxHeight;
         private final int tpRange;
+        //Number of ticks between teleports;
+        private final int tpInterval;
 
-        GrowthStage(int strengthLevel, float eyeHeight, int averTPLen, float width, float height, int tpRange) {
+        GrowthStage(int strengthLevel, float eyeHeight, int averTPLen, float width, float height, int tpRange, int tpInterval) {
             this.strengthLevel = strengthLevel;
             this.eyeHeight = eyeHeight;
             this.averageTPLength = averTPLen;
             this.bBoxWidth = width;
             this.bBoxHeight = height;
             this.tpRange = tpRange;
+            this.tpInterval = tpInterval;
         }
 
         //Getters below here
@@ -61,6 +65,7 @@ public abstract class EnderhoundEntity extends CreatureEntity implements Compara
         public float getBoxWidth() { return bBoxWidth; }
         public float getBoxHeight() { return bBoxHeight; }
         public int getTpRange() { return tpRange; }
+        public int getTpInterval() { return tpInterval; }
     }
 
     public enum Personality {
@@ -114,7 +119,8 @@ public abstract class EnderhoundEntity extends CreatureEntity implements Compara
         this.goalSelector.addGoal(0, new MeleeAttackGoal(this, 1.0D, false));
         this.goalSelector.addGoal(1, new FollowLeaderGoal(this));
         this.goalSelector.addGoal(2, new RandomWalkingGoal(this, 1.0D));
-        this.goalSelector.addGoal(3, new PackLogicGoal(this));
+        this.goalSelector.addGoal(3, new PeacetimeLogicGoal(this));
+        this.goalSelector.addGoal(1, new TemporaryEscapeGoal(this, LivingEntity.class, false));
         this.targetSelector.addGoal(4, new NearestAttackableTargetGoal<>(this, EndermiteEntity.class, true));
     }
 
@@ -288,6 +294,10 @@ public abstract class EnderhoundEntity extends CreatureEntity implements Compara
         super.livingTick();
     }
 
+    public float getHealthRatio() {
+        return this.getHealth() / this.getMaxHealth();
+    }
+
     @Override
     protected void updateAITasks() {
         if (this.isInWaterRainOrBubbleColumn()) {
@@ -433,18 +443,26 @@ public abstract class EnderhoundEntity extends CreatureEntity implements Compara
         int range = this.stage.getTpRange();
         this.teleportTo(x + range * Math.cos(angleTowardsPoint), y, z + range * Math.sin(angleTowardsPoint));
     }
+
+    public void teleportOnceTowards(BlockPos pos) {
+        this.teleportOnceTowards(pos.getX(), pos.getY(), pos.getZ());
+    }
+
     ///////////////////////////
     //END OF TELEPORT METHODS//
     ///////////////////////////
 
     public boolean attackEntityFrom(DamageSource source, float amount) {
         super.attackEntityFrom(source, amount);
-        Entity e = source.getTrueSource();
-        if(e instanceof LivingEntity) {
-            this.setAttackTarget((LivingEntity) e);
-            this.pingNewAttackTarget((LivingEntity) e);
+        if(!this.world.isRemote) {
+            Entity e = source.getTrueSource();
+            if (e instanceof LivingEntity) {
+                this.setAttackTarget((LivingEntity) e);
+                this.pingNewAttackTarget((LivingEntity) e);
+            }
+            return true;
         }
-        return true;
+        return false;
     }
 
     public void pingNewAttackTarget(LivingEntity targ) {
@@ -471,6 +489,23 @@ public abstract class EnderhoundEntity extends CreatureEntity implements Compara
                 }
             }
         }
+    }
+
+    /**
+     * Given startPos and middlePos, calculates a third point 64 blocks away from the second point, on the infinite line
+     * intersecting startPos and middlePos
+     */
+    public static BlockPos getBlockPosAwayFrom(BlockPos startPos, BlockPos middlePos) {
+        double xDist = middlePos.getX() - startPos.getX();
+        double yDist = middlePos.getY() - startPos.getY();
+        double zDist = middlePos.getZ() - startPos.getZ();
+        double diagDist = Math.sqrt(xDist * xDist + yDist * yDist + zDist * zDist);
+        double scale = 64 / diagDist;
+        return new BlockPos(
+                middlePos.getX() + xDist * scale,
+                middlePos.getY() + yDist * scale,
+                middlePos.getZ() + zDist * scale
+        );
     }
 
     //Simple getters

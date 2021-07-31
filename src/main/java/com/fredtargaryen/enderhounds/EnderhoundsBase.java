@@ -1,11 +1,8 @@
 /**
  * TODO
- * Adult Model
- * Elderly Model
- * Fix hitboxes (check 1)
- * Fix eye heights (check 1)
+ * After fleeing, hound does not attack again
+ * Delay too high between hit and flee
  * AI for getting hit
- * AI for ranged powers
  * Pelt armour
  * Humans and Endermen as leaders
  * Sound
@@ -13,16 +10,13 @@
  *
  * COMBAT LOGIC
  * Aggressive:
- * -At >20% health, will take 3 hits before tp'ing
  * -Stares and shakes very briefly before attacking
  * Cunning:
- * -Tp's away after one or two hits
  * -Can teleport behind target
  * -Stares and shakes a random amount of time before
  * attacking
  * -Occasionally pretends to give in at <50% health
  * Weak:
- * -Teleports far away on hit
  * -Stares for a long time before attacking
  *
  * PACK LOGIC
@@ -34,12 +28,19 @@
  * -Will surrender at <20% health if challenged
  * Weak:
  * -Will never challenge
- * -Will always surrender if challenged
+ * -Will surrender at <60% health if challenged
  *
+ * AI for ranged powers
  * POWERS
  * Ball: Long range straight line projectile
  * Doppel: Create an identical copy of the Enderhound that moves in a different direction and dies in one hit
  * Jaws: Pick up hostile mobs and place them near the target (these ones can bring food and items to leaders in peacetime)
+ *
+ * Adult Model
+ * Elderly Model
+ * Fix hitboxes (check 1)
+ * Fix eye heights (check 1)
+ * Enderhounds don't try to escape the rain
  */
 package com.fredtargaryen.enderhounds;
 

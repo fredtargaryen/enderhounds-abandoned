@@ -93,6 +93,7 @@ public class PupEnderhoundModel extends EntityModel<PupEnderhoundEntity> {
         Snout = new RendererModel(this, 0, 17);
         Snout.addBox(-2.5F, -0.5F, -4F, 5, 1, 4);
         Snout.setTextureSize(64, 32);
+        Snout.setRotationPoint(0F, 8.2F, -9F);
         setRotation(Snout, 0F, 0F, 0F);
 
         Ear_R = new RendererModel(this, 51, 10);

@@ -3,17 +3,17 @@ package com.fredtargaryen.enderhounds.entity.ai;
 import com.fredtargaryen.enderhounds.entity.EnderhoundEntity;
 import net.minecraft.entity.ai.goal.Goal;
 
-public class PackLogicGoal extends Goal {
+public class PeacetimeLogicGoal extends Goal {
     private EnderhoundEntity hound;
     private short ticksUntilRefreshLeader = 100;
 
-    public PackLogicGoal(EnderhoundEntity hound) {
+    public PeacetimeLogicGoal(EnderhoundEntity hound) {
         this.hound = hound;
     }
 
     @Override
     public boolean shouldExecute() {
-        return this.hound.getAttackTarget() == null;
+        return this.hound.getAttackTarget() != null;
     }
 
     @Override
